@@ -2,9 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { PlayerService } from 'src/app/services/player.service';
+import { PlayerService } from '../services/player/player.service'; // <-- CORREGIDO CON ../
 
-// Importaciones y registro de controladores para Chart.js Radar [cite: 22]
+// Importaciones y registro de controladores para Chart.js Radar
 import { Chart, RadarController, LinearScale, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -12,7 +12,7 @@ Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Fi
   selector: 'app-player-detail',
   standalone: true,
   imports: [BaseChartDirective, RouterModule],
-  templateUrl: './player-detail.html' // <-- Corregido para que coincida con tu archivo real
+  templateUrl: './player-detail.html' // Apunta a tu archivo HTML de al lado
 })
 export class PlayerDetailComponent implements OnInit {
   playerId: string | null = null;
@@ -29,7 +29,7 @@ export class PlayerDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private playerService: PlayerService 
+    private playerService: PlayerService // Inyección limpia del servicio
   ) {}
 
   ngOnInit(): void {
@@ -37,28 +37,28 @@ export class PlayerDetailComponent implements OnInit {
     
     if (this.playerId) {
       this.playerService.getPlayerById(this.playerId).subscribe({
-        next: (player: any) => {  // <-- Agregado ': any' para evitar el error TS7006
+        next: (player: any) => {  
           this.playerData = player;
           
-          // Mapeo dinámico de las estadísticas de la base de datos [cite: 5, 22]
+          // Mapeo dinámico de las estadísticas reales que vienen de la base de datos
           this.radarChartData = {
             labels: this.radarChartLabels,
             datasets: [
               {
                 data: [
-                  player.pace || player.dataValues?.pace || 0,
-                  player.shooting || player.dataValues?.shooting || 0,
-                  player.passing || player.dataValues?.passing || 0,
-                  player.dribbling || player.dataValues?.dribbling || 0,
-                  player.defending || player.dataValues?.defending || 0,
-                  player.physical || player.dataValues?.physical || 0
+                  player.pace || 0,
+                  player.shooting || 0,
+                  player.passing || 0,
+                  player.dribbling || 0,
+                  player.defending || 0,
+                  player.physical || 0
                 ],
                 label: `Skills de ${player.shortName || player.name || 'Jugador'}`
               }
             ]
           };
         },
-        error: (err: any) => console.error('Error al traer detalles del jugador:', err) // <-- Agregado ': any' aquí también
+        error: (err: any) => console.error('Error al traer detalles del jugador:', err)
       });
     }
   }
