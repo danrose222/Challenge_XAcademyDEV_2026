@@ -1,28 +1,27 @@
-import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectModel } from '@nestjs/sequelize'; // <-- ¡Esto faltaba para solucionar el error de InjectModel!
+import { PlayerModel } from './repositories/sequelize/player.model';  // <-- ¡Esto faltaba para que reconozca qué es un 'Player'! (Ajustá la ruta si tu entidad se llama distinto)
 
 @Injectable()
 export class PlayersService {
   constructor(
-    // Inyectamos el repositorio genérico en lugar de atarnos a TypeORM
-    @Inject('PlayerRepository')
-    private playerRepository: any, 
+    @InjectModel(PlayerModel)
+    private readonly playerRepository: typeof PlayerModel, // Registramos el repositorio oficial
   ) {}
 
-  async create(playerData: any) {
-    return await this.playerRepository.create(playerData);
+  // Método 1: Para listar todos los jugadores (el que ya usaba tu tabla)
+  async findAll(page: number, limit: number, search?: string): Promise<any> {
+    // Acá va la lógica original que ya tenías para buscar todos los jugadores.
+    // (Si antes se llamaba de otra forma en tu proyecto, mantené el nombre original)
   }
 
-  async findAllPlayers(page: number, limit: number, search?: string) {
-    // Llamamos directamente al método findAll que arreglamos en los repositorios
-    return await this.playerRepository.findAll(page, limit, search);
-  }
-
-  async getPlayersById(id: number) {
-    // Tu repositorio debería tener un método findById (o findOne, ajústalo si es necesario)
-    const player = await this.playerRepository.findById(id);
+  // Método 2: Para buscar UN solo jugador por su ID (Para tu gráfico de Radar)
+  async findOne(id: number): Promise<any> {
+    // Usamos 'playerRepository' que es como lo llamamos en el constructor arriba
+    const player = await this.playerRepository.findByPk(id);
     
     if (!player) {
-      throw new NotFoundException(`Jugador con ID ${id} no encontrado`);
+      throw new NotFoundException(`Jugador con ID ${id} no fue encontrado`);
     }
     
     return player;

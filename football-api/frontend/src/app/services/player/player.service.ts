@@ -17,7 +17,8 @@ export class PlayerService {
   }
 
   
-  getPlayerById(id: number): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/${id}`);
-  }
+  // En un PlayerService de Angular
+getPlayerById(id: string): Observable<any> {
+  return this.http.get(`${this.apiUrl}/players/${id}`);
+}
 }

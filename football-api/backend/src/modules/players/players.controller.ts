@@ -15,41 +15,17 @@ import { PlayerDto } from './dto/player.dto';
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
-  @Get()
-  @HttpCode(HttpStatus.OK)
-  async getAllPlayers(
-    
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '20',
-    @Query('search') search?: string,
-  ) {
-    
-    const pageNumber = parseInt(page, 10);
-    const limitNumber = parseInt(limit, 10);
-
-    
-    const result = await this.playersService.findAllPlayers(pageNumber, limitNumber, search);
-    
-    
-    return {
-      data: result.data.map((player: any) => new PlayerDto(player)),
-      total: result.total,
-      page: pageNumber,
-      limit: limitNumber
-    };
-  }
+@Get()
+async findAll(@Query('page') page = 1, @Query('limit') limit = 10, @Query('search') search?: string) {
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
+  // Cambiamos 'findAllPlayers' por 'findAll' para que coincida con el Service
+  return await this.playersService.findAll(pageNumber, limitNumber, search);
+}
 
   @Get(':id')
-  @HttpCode(HttpStatus.OK)
-  async getPlayerById(
-    @Param('id', ParseIntPipe) id: number,
-  ): Promise<PlayerDto | undefined> {
-    const player = await this.playersService.getPlayersById(id);
-    console.log(`Fetching player  ${player}`);
-    if (!player) {
-      throw new NotFoundException(`Player with ID ${id} not found.`);
-    }
-
-    return new PlayerDto(player);
-  }
+async getPlayerById(@Param('id') id: number) {
+  // Cambiamos 'getPlayersById' por 'findOne' para que coincida con el Service
+  return await this.playersService.findOne(id);
+}
 }
