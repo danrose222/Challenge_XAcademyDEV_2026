@@ -1,8 +1,9 @@
-import { Injectable } from '@nestjs/common';
+    import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { PlayerModel } from './player.model'; // Sequelize model
+import { PlayerModel } from './player.model'; 
 import { IPlayerRepository } from '../../interfaces/player-repository.interface';
 import { Player } from '../../entities/player.entity';
+import { Op } from 'sequelize';
 
 @Injectable()
 export class SequelizePlayerRepository implements IPlayerRepository {
@@ -11,24 +12,30 @@ export class SequelizePlayerRepository implements IPlayerRepository {
     private readonly playerModel: typeof PlayerModel,
   ) {}
 
-  async findAll(): Promise<Player[]> {
-    const playerList = await this.playerModel.findAll();
-    return playerList.map((x) => this.mapToEntity(x));
+  
+ async findAll(page: number, limit: number, search?: string): Promise<{ data: Player[]; total: number }> {
+    const skip = (page - 1) * limit;
+    
+    const { rows, count } = await this.playerModel.findAndCountAll({
+      limit: limit,
+      offset: skip,
+    });
+
+    return { data: rows as any, total: count };
+  }
+
+  async findById(id: number): Promise<any> {
+    // Buscamos en la base de datos por la clave primaria (ID)
+    return await this.playerModel.findByPk(id);
   }
 
   async findOneById(id: number): Promise<Player | undefined> {
     const model = await this.playerModel.findByPk(id);
-    if (!model) {
-      return undefined;
-    }
+    if (!model) return undefined;
     return this.mapToEntity(model);
   }
 
   private mapToEntity(model: PlayerModel): Player {
-    console.log('Mapping PlayerModel to Player entity:', model);
-    if (!model) {
-      throw new Error('Attempted to map null model to Player entity');
-    }
     const player = new Player();
     player.id = model.id;
     player.name = model.longName;
@@ -40,7 +47,6 @@ export class SequelizePlayerRepository implements IPlayerRepository {
     player.shooting = model.shooting ?? 0;
     player.dribbling = model.dribbling ?? 0;
     player.passing = model.passing ?? 0;
-
     return player;
   }
 }

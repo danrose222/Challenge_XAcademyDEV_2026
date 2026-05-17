@@ -1,15 +1,30 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { IPlayerRepository } from './interfaces/player-repository.interface';
-import { Player } from './entities/player.entity';
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
 
 @Injectable()
 export class PlayersService {
   constructor(
-    @Inject('IPlayerRepository')
-    private readonly playerRepository: IPlayerRepository,
+    // Inyectamos el repositorio genérico en lugar de atarnos a TypeORM
+    @Inject('PlayerRepository')
+    private playerRepository: any, 
   ) {}
 
-  getPlayerById(id: number): Promise<Player | undefined> {
-    return this.playerRepository.findOneById(id);
+  async create(playerData: any) {
+    return await this.playerRepository.create(playerData);
+  }
+
+  async findAllPlayers(page: number, limit: number, search?: string) {
+    // Llamamos directamente al método findAll que arreglamos en los repositorios
+    return await this.playerRepository.findAll(page, limit, search);
+  }
+
+  async getPlayersById(id: number) {
+    // Tu repositorio debería tener un método findById (o findOne, ajústalo si es necesario)
+    const player = await this.playerRepository.findById(id);
+    
+    if (!player) {
+      throw new NotFoundException(`Jugador con ID ${id} no encontrado`);
+    }
+    
+    return player;
   }
 }

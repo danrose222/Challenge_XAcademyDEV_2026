@@ -1,0 +1,54 @@
+<div class="container" style="margin-top: 20px; font-family: sans-serif;">
+  <h2>Lista de Jugadores (Total: {{ filteredPlayers.length }})</h2>
+
+ <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (input)="onSearch()" 
+      placeholder="Buscar por nombre o club..."
+      style="padding: 10px; width: 100%; max-width: 400px; border: 1px solid #ccc; border-radius: 4px;"
+    />
+    
+    <button 
+      (click)="exportToCSV()" 
+      style="padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+      📥 Descargar CSV
+    </button>
+  </div>
+
+  <table style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+    <thead>
+      <tr style="background-color: #0056b3; color: white; text-align: left;">
+        <th style="padding: 12px;">Nombre</th>
+        <th style="padding: 12px;">Club</th>
+        <th style="padding: 12px;">Nacionalidad</th>
+        <th style="padding: 12px; text-align: center;">Rating</th>
+        <th style="padding: 12px; text-align: center;">Edad</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let player of filteredPlayers" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 12px;">
+          {{ player.dataValues?.longName || player.longName || player.name }}
+        </td>
+        <td style="padding: 12px;">
+          {{ player.dataValues?.clubName || player.clubName || player.club }}
+        </td>
+        <td style="padding: 12px;">
+          {{ player.dataValues?.nationalityName || player.nationalityName || player.nationality }}
+        </td>
+        <td style="padding: 12px; text-align: center; font-weight: bold; color: #2e7d32;">
+          {{ player.dataValues?.overall || player.overall || player.rating }}
+        </td>
+        <td style="padding: 12px; text-align: center;">
+          {{ player.dataValues?.age || player.age }}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="filteredPlayers.length === 0" style="margin-top: 20px; text-align: center; color: #777;">
+    No se encontraron jugadores con "{{ searchTerm }}"
+  </div>
+</div>

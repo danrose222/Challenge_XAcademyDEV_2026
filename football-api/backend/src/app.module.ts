@@ -1,24 +1,27 @@
-// src/app.module.ts
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
-import sequelizeConfig from './config/sequelize.config';
-import { PlayersModule } from './modules/players/players.module';
+import { Player } from './modules/players/entities/player.entity';
+import { PlayersModule } from './modules/players/players.module'; 
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      isGlobal: true,
-      envFilePath: '.env',
+    ConfigModule.forRoot({ isGlobal: true }),
+    
+    SequelizeModule.forRoot({
+      dialect: 'mysql',
+      host: 'mysql_db',
+      port: 3306,
+      username: 'football_api',
+      password: 'password',
+      database: 'football_db',
+      models: [Player],
+      autoLoadModels: true,
+      synchronize: false,
     }),
-    SequelizeModule.forRoot(sequelizeConfig),
+
+    
     PlayersModule,
   ],
-  controllers: [],
-  providers: [],
 })
-export class AppModule {
-  constructor() {
-    console.log('Sequelize config loaded:', sequelizeConfig.models);
-  }
-}
+export class AppModule {}

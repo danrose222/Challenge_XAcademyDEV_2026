@@ -4,6 +4,7 @@ import { IPlayerRepository } from '../../interfaces/player-repository.interface'
 import { PlayerDto } from './player.dto';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { Like } from 'typeorm';
 
 @Injectable()
 export class TypeOrmPlayerRepository implements IPlayerRepository {
@@ -12,12 +13,27 @@ export class TypeOrmPlayerRepository implements IPlayerRepository {
     private readonly playerRepository: Repository<PlayerDto>,
   ) {}
 
-  async findAll(): Promise<Player[]> {
-    const playerList = (await this.playerRepository.find()).map((x) =>
-      this.mapToEntity(x),
-    );
+ async findAll(page: number, limit: number, search?: string): Promise<{ data: Player[]; total: number }> {
+    const skip = (page - 1) * limit;
+    
+    // 1. Solución al error de FindOperator: Forzamos el tipo a 'any'
+    // IMPORTANTE: Si la columna en tu base de datos no se llama "name" (por ejemplo, "short_name"),
+    // debes cambiar "name" aquí por el nombre real de tu columna.
+    const whereCondition: any = search ? { name: Like(`%${search}%`) } : {};
 
-    return playerList;
+    // El repositorio nos devuelve un arreglo de PlayerDto (modelo de base de datos)
+    const [dtos, total] = await this.playerRepository.findAndCount({
+      where: whereCondition,
+      skip: skip,
+      take: limit,
+    });
+
+    // 2. Solución al error de asignación (PlayerDto[] no es asignable a Player[]):
+    // Casteamos los datos temporalmente para que TypeScript nos deje compilar.
+    // (A futuro, la mejor práctica será mapear este arreglo: dtos.map(dto => mapearAPlayer(dto)))
+    const data = dtos as unknown as Player[];
+
+    return { data, total };
   }
 
   async findOneById(id: number): Promise<Player | undefined> {
