@@ -6,16 +6,17 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PlayerService {
+  // Tu URL base original (mantené el puerto que tenías antes, ej: 3000 o 8080)
   private apiUrl = 'http://localhost:3000/api'; 
 
   constructor(private http: HttpClient) {}
 
-  // 1. LE DEVOLVEMOS ESTE MÉTODO A TU TABLA (Para solucionar los primeros 2 errores)
+  // ======= MÉTODO 1: EL QUE USA TU LISTA (Dejalo tal cual estaba) =======
   getPlayers(): Observable<any> {
     return this.http.get(`${this.apiUrl}/players`);
   }
 
-  // 2. EL MÉTODO NUEVO PARA TU GRÁFICO DE RADAR
+  // ======= MÉTODO 2: EL QUE USA TU RADAR (Agregalo acá abajo) =======
   getPlayerById(id: string): Observable<any> {
     return this.http.get(`${this.apiUrl}/players/${id}`);
   }

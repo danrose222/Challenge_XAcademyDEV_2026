@@ -1,76 +1,83 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common'; 
-import { FormsModule } from '@angular/forms'; 
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { PlayerService } from './services/player/player.service';
-import * as XLSX from 'xlsx';
-import { RouterOutlet } from '@angular/router';
+
 @Component({
   selector: 'app-root',
-  templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css'],
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterOutlet]
+  imports: [CommonModule, RouterModule, FormsModule],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  players: any[] = [];
-  filteredPlayers: any[] = [];
+  title = 'Listado de Jugadores';
+  
+  players: any[] = []; 
+  
+  filteredPlayers: any[] = []; 
+  
   searchTerm: string = ''; 
 
   constructor(private playerService: PlayerService) {}
 
   ngOnInit(): void {
-    this.loadPlayers();
+    this.cargarLista();
   }
 
-  loadPlayers(): void {
+  cargarLista(): void {
     this.playerService.getPlayers().subscribe({
       next: (response: any) => {
         console.log('Respuesta cruda del backend:', response);
         
-        if (response && response.data) {
-          this.players = response.data;
-        } else if (Array.isArray(response)) {
-          this.players = response;
-        } else {
-          this.players = [];
-        }
-
-        this.filteredPlayers = [...this.players];
+        this.players = response.data || []; 
+        
+        
+        this.filteredPlayers = [...this.players]; 
       },
-      error: (err: any) => console.error('Error al cargar jugadores:', err)
+      error: (err: any) => {
+        console.error('Error al traer los jugadores:', err);
+      }
     });
   }
 
   onSearch(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredPlayers = [...this.players];
-      return;
-    }
+    const term = this.searchTerm.toLowerCase().trim();
     
-    const search = this.searchTerm.toLowerCase();
     this.filteredPlayers = this.players.filter(player => {
+
+      const name = (player.dataValues?.longName || player.longName || player.name || '').toLowerCase();
+      const club = (player.dataValues?.clubName || player.clubName || player.club || '').toLowerCase();
       
-      const name = player.dataValues?.longName || player.longName || player.name || '';
-      const club = player.dataValues?.clubName || player.clubName || player.club || '';
-      return name.toLowerCase().includes(search) || club.toLowerCase().includes(search);
+      return name.includes(term) || club.includes(term);
     });
   }
+
   exportToCSV(): void {
-    // 1. Limpiamos y preparamos los datos
-    const dataToExport = this.filteredPlayers.map(player => ({
-      Nombre: player.dataValues?.longName || player.longName || player.name,
-      Club: player.dataValues?.clubName || player.clubName || player.club,
-      Nacionalidad: player.dataValues?.nationalityName || player.nationalityName || player.nationality,
-      Rating: player.dataValues?.overall || player.overall || player.rating,
-      Edad: player.dataValues?.age || player.age
-    }));
+    if (this.filteredPlayers.length === 0) return;
 
-    // 2. Convertimos a hoja de cálculo
-    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Jugadores');
+    const headers = ['Nombre', 'Club', 'Nacionalidad', 'Rating', 'Edad'];
+    const csvRows = [headers.join(',')];
 
-    // 3. Forzamos la descarga en CSV
-    XLSX.writeFile(workbook, 'Listado_Jugadores.csv', { bookType: 'csv' });
+    for (const player of this.filteredPlayers) {
+      const name = player.dataValues?.longName || player.longName || player.name || '';
+      const club = player.dataValues?.clubName || player.clubName || player.club || '';
+      const nationality = player.dataValues?.nationalityName || player.nationalityName || player.nationality || '';
+      const rating = player.dataValues?.overall || player.overall || player.rating || '';
+      const age = player.dataValues?.age || player.age || '';
+      const row = [`"${name}"`, `"${club}"`, `"${nationality}"`, rating, age];
+      csvRows.push(row.join(','));
+    }
+
+    const csvString = csvRows.join('\n');
+    const blob = new Blob([csvString], { type: 'text/csv;charset=utf-8;' });
+    const url = window.URL.createObjectURL(blob);
+    
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'jugadores_filtrados.csv';
+    a.click();
+    window.URL.revokeObjectURL(url);
   }
 }
