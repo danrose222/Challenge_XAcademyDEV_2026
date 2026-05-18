@@ -12,13 +12,14 @@ import { PlayerService } from './services/player/player.service';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit {
-  title = 'Listado de Jugadores';
-  
   players: any[] = []; 
-  
   filteredPlayers: any[] = []; 
-  
   searchTerm: string = ''; 
+
+  // Variables de paginación
+  currentPage: number = 1;
+  totalPages: number = 1;
+  totalRecords: number = 0;
 
   constructor(private playerService: PlayerService) {}
 
@@ -27,14 +28,14 @@ export class AppComponent implements OnInit {
   }
 
   cargarLista(): void {
-    this.playerService.getPlayers().subscribe({
+    this.playerService.getPlayers(this.currentPage).subscribe({
       next: (response: any) => {
-        console.log('Respuesta cruda del backend:', response);
-        
         this.players = response.data || []; 
-        
-        
         this.filteredPlayers = [...this.players]; 
+        
+        // Guardamos los datos de paginación
+        this.totalPages = response.totalPages || 1;
+        this.totalRecords = response.total || 0;
       },
       error: (err: any) => {
         console.error('Error al traer los jugadores:', err);
@@ -42,11 +43,24 @@ export class AppComponent implements OnInit {
     });
   }
 
+  siguientePagina(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.cargarLista();
+    }
+  }
+
+  paginaAnterior(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.cargarLista();
+    }
+  }
+
   onSearch(): void {
     const term = this.searchTerm.toLowerCase().trim();
     
     this.filteredPlayers = this.players.filter(player => {
-
       const name = (player.dataValues?.longName || player.longName || player.name || '').toLowerCase();
       const club = (player.dataValues?.clubName || player.clubName || player.club || '').toLowerCase();
       
@@ -66,6 +80,7 @@ export class AppComponent implements OnInit {
       const nationality = player.dataValues?.nationalityName || player.nationalityName || player.nationality || '';
       const rating = player.dataValues?.overall || player.overall || player.rating || '';
       const age = player.dataValues?.age || player.age || '';
+
       const row = [`"${name}"`, `"${club}"`, `"${nationality}"`, rating, age];
       csvRows.push(row.join(','));
     }
