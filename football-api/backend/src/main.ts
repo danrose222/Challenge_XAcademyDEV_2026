@@ -17,6 +17,7 @@ async function bootstrap() {
     )
     .setVersion('1.0')
     .addTag('Players', 'Endpoints relacionados con la gestión y consulta de jugadores')
+    .addBearerAuth()
     .build();
 
   const document = SwaggerModule.createDocument(app, config);

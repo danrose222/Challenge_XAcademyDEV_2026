@@ -1,9 +1,10 @@
-import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post} from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards} from '@nestjs/common';
 import { Response } from 'express';
 import { PlayersService } from './players.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger'; 
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth } from '@nestjs/swagger'; 
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerDto } from './dto/player.dto';
+import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @ApiTags('Players') 
 @Controller('players')
@@ -54,12 +55,16 @@ export class PlayersController {
     res.send(buffer);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
   @ApiOperation({ summary: 'Crear un jugador nuevo en la base de datos' })
   @ApiBody({ type: PlayerDto, description: 'Datos del nuevo jugador' }) 
   @ApiResponse({ status: 201, description: 'Jugador creado exitosamente.' })
 
-  async create(@Body() playerData: PlayerDto) {
+  async create(
+  
+    @Body() playerData: PlayerDto) {
     return await this.playersService.create(playerData);
   }
 
@@ -72,6 +77,8 @@ export class PlayersController {
     return this.playersService.findOne(id);
   }
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Patch(':id')
   @ApiOperation({ summary: 'Editar la información de un jugador existente' })
   @ApiBody({ type: UpdatePlayerDto, description: 'Datos a modificar del jugador' })
