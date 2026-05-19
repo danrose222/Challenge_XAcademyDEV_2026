@@ -92,6 +92,12 @@ export class PlayersService {
     return player;
   }
 
+  async create(playerData: any): Promise<any> {
+    
+    const newPlayer = await this.playerRepository.create(playerData);
+    return newPlayer;
+  }
+
   async findOne(id: number): Promise<any> {
    
     const player = await this.playerRepository.findByPk(id);
