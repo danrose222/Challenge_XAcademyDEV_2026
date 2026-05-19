@@ -1,12 +1,16 @@
-<div *ngIf="player; else noPlayer">
-  <h2>{{ player['longName'] || player['name'] }}</h2>
-  <p>Club: {{ player['clubName'] || player['club'] }}</p>
-  <p>Posición: {{ player['playerPositions'] || player['position'] }}</p>
-  <p>Nacionalidad: {{ player['nationalityName'] || player['nationality'] }}</p>
-  <p>Rating: {{ player['overall'] || player['rating'] }}</p>
+<div *ngIf="players.length > 0; else noPlayers">
+  <h2>Plantilla del Equipo</h2>
+  
+  <div *ngFor="let p of players" style="border: 1px solid #ccc; margin-bottom: 10px; padding: 10px;">
+    <h3>{{ p['longName'] || p['name'] }}</h3>
+    <p><strong>Club:</strong> {{ p['clubName'] || p['club'] }}</p>
+    <p><strong>Posición:</strong> {{ p['playerPositions'] || p['position'] }}</p>
+    <p><strong>Nacionalidad:</strong> {{ p['nationalityName'] || p['nationality'] }}</p>
+    <p><strong>Rating:</strong> {{ p['overall'] || p['rating'] }}</p>
+  </div>
 </div>
 
-<ng-template #noPlayer>
-  <p *ngIf="errorMessage">{{ errorMessage }}</p>
-  <p *ngIf="!errorMessage">Cargando datos del jugador...</p>
+<ng-template #noPlayers>
+  <p *ngIf="errorMessage" style="color: red;">{{ errorMessage }}</p>
+  <p *ngIf="!errorMessage">Cargando la plantilla del equipo...</p>
 </ng-template>
