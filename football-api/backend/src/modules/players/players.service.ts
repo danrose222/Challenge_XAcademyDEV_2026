@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { PlayerModel } from './repositories/sequelize/player.model';
 import { Op } from 'sequelize'; 
 import * as xlsx from 'xlsx';
+import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @Injectable()
 export class PlayersService {
@@ -76,6 +77,19 @@ export class PlayersService {
     const csvBuffer = xlsx.write(workbook, { type: 'buffer', bookType: 'csv' });
     
     return csvBuffer;
+  }
+
+  async update(id: number, updatePlayerDto: UpdatePlayerDto): Promise<any> {
+    
+    const player = await this.playerRepository.findByPk(id);
+    
+    if (!player) {
+      throw new NotFoundException(`El jugador con ID ${id} no existe en la base de datos.`);
+    }
+
+    await player.update(updatePlayerDto);
+    
+    return player;
   }
 
   async findOne(id: number): Promise<any> {

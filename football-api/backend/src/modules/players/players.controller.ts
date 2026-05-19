@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Query, ParseIntPipe, Res } from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body } from '@nestjs/common';
 import { Response } from 'express';
 import { PlayersService } from './players.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger'; 
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody } from '@nestjs/swagger'; 
+import { UpdatePlayerDto } from './dto/update-player.dto';
 
 @ApiTags('Players') 
 @Controller('players')
@@ -55,7 +56,20 @@ export class PlayersController {
   @ApiOperation({ summary: 'Obtener un jugador específico por su identificador único (ID)' })
   @ApiResponse({ status: 200, description: 'Jugador encontrado y mapeado con éxito.' })
   @ApiResponse({ status: 404, description: 'El ID ingresado no corresponde a ningún jugador en la base de datos.' })
+
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.playersService.findOne(id);
+  }
+
+  @Patch(':id')
+  @ApiOperation({ summary: 'Editar la información de un jugador existente' })
+  @ApiBody({ type: UpdatePlayerDto, description: 'Datos a modificar del jugador' })
+  @ApiResponse({ status: 200, description: 'Jugador actualizado con éxito.' })
+  
+  async update(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() updatePlayerDto: UpdatePlayerDto,
+  ) {
+    return await this.playersService.update(id, updatePlayerDto);
   }
 }
