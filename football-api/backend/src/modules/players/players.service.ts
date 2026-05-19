@@ -1,32 +1,39 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/sequelize'; // <-- ¡Esto faltaba para solucionar el error de InjectModel!
-import { PlayerModel } from './repositories/sequelize/player.model';  // <-- ¡Esto faltaba para que reconozca qué es un 'Player'! (Ajustá la ruta si tu entidad se llama distinto)
+import { InjectModel } from '@nestjs/sequelize';
+import { PlayerModel } from './repositories/sequelize/player.model';
 
 @Injectable()
 export class PlayersService {
   constructor(
     @InjectModel(PlayerModel)
-    private readonly playerRepository: typeof PlayerModel, // Registramos el repositorio oficial
+    private readonly playerRepository: typeof PlayerModel,
   ) {}
 
-  // En src/modules/players/players.service.ts
-
-// ... tu constructor y el método findOne se quedan igual ...
-
-  // Método para listar todos los jugadores (El que usa tu tabla principal)
-  async findAll(page: number, limit: number, search?: string): Promise<any> {
-    // 1. Usamos el repositorio para traer los datos reales de la base de datos
-    // Nota: Si usas paginación o filtros, Sequelize usa findAndCountAll
+  // Agregamos los parámetros de nationality y position que vienen del controlador
+  async findAll(page: number, limit: number, nationality?: string, position?: string): Promise<any> {
+    
     const offset = (page - 1) * limit;
     
-    // Si hay una búsqueda por nombre, puedes aplicarla acá, 
-    // pero para destrabar la pantalla traigamos los registros base:
+    // 1. Creamos el objeto de condiciones vacío
+    const whereCondition: any = {};
+
+    // 2. Filtro dinámico: Si el usuario mandó país, lo sumamos
+    if (nationality) {
+      whereCondition.nationalityName = nationality; // <-- ACÁ ESTÁ LA MAGIA
+    }
+
+    // 3. Filtro dinámico: Si el usuario mandó posición, la sumamos
+    if (position) {
+      whereCondition.playerPositions = position; // <-- Y ACÁ TAMBIÉN
+    }
+   
+    // 4. Se lo pasamos a Sequelize (agregando la propiedad "where")
     const { rows, count } = await this.playerRepository.findAndCountAll({
+      where: whereCondition, // <--- ¡Acá ocurre la magia!
       limit: limit,
       offset: offset,
     });
 
-    // 2. Devolvemos el objeto que tu tabla de Angular espera recibir
     return {
       data: rows,
       total: count,
@@ -35,9 +42,8 @@ export class PlayersService {
     };
   }
 
-  // Método 2: Para buscar UN solo jugador por su ID (Para tu gráfico de Radar)
   async findOne(id: number): Promise<any> {
-    // Usamos 'playerRepository' que es como lo llamamos en el constructor arriba
+   
     const player = await this.playerRepository.findByPk(id);
     
     if (!player) {
