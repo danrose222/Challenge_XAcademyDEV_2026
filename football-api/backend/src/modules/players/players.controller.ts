@@ -1,4 +1,5 @@
-import { Controller, Get, Param, Query, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, Res } from '@nestjs/common';
+import { Response } from 'express';
 import { PlayersService } from './players.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger'; 
 
@@ -7,20 +8,47 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}
 
-  @Get()
+ @Get()
   @ApiOperation({ summary: 'Obtener el listado paginado de jugadores' })
   @ApiQuery({ name: 'page', required: false, description: 'Número de página a consultar', example: 1 })
   @ApiQuery({ name: 'limit', required: false, description: 'Cantidad de registros por página', example: 10 })
-  @ApiQuery({ name: 'nationality', required: false, description: 'Filtrar por nombre del país (Ej: Brazil, Argentina)' })
-  @ApiQuery({ name: 'position', required: false, description: 'Filtrar por posición en la cancha (Ej: Forward, Goalkeeper)' })
+  @ApiQuery({ name: 'nationality', required: false, description: 'Filtrar por nombre del país (Ej: Brazil)' })
+  @ApiQuery({ name: 'position', required: false, description: 'Filtrar por posición (Ej: ST, GK)' })
+  @ApiQuery({ name: 'name', required: false, description: 'Buscar por nombre parcial (Ej: Messi)' })
+  @ApiQuery({ name: 'club', required: false, description: 'Buscar por club parcial (Ej: Paris)' })
   @ApiResponse({ status: 200, description: 'Listado de jugadores devuelto con éxito.' })
+
   async findAll(
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,
     @Query('nationality') nationality?: string,
     @Query('position') position?: string,
+    @Query('name') name?: string,
+    @Query('club') club?: string,
   ) {
-    return await this.playersService.findAll(page, limit, nationality, position);
+
+    return await this.playersService.findAll(page, limit, nationality, position, name, club);
+    
+  }
+
+  @Get('export')
+  @ApiOperation({ summary: 'Exportar jugadores filtrados a CSV' })
+
+  async exportCsv(
+    @Res() res: Response,
+    @Query('nationality') nationality?: string,
+    @Query('position') position?: string,
+    @Query('name') name?: string,
+    @Query('club') club?: string,
+  ) {
+    const buffer = await this.playersService.exportCsv(nationality, position, name, club);
+    
+    res.set({
+      'Content-Type': 'text/csv',
+      'Content-Disposition': 'attachment; filename=jugadores.csv',
+    });
+    
+    res.send(buffer);
   }
 
   @Get(':id')
