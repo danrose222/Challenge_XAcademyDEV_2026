@@ -7,6 +7,10 @@
     <p><strong>Posición:</strong> {{ p['playerPositions'] || p['position'] }}</p>
     <p><strong>Nacionalidad:</strong> {{ p['nationalityName'] || p['nationality'] }}</p>
     <p><strong>Rating:</strong> {{ p['overall'] || p['rating'] }}</p>
+    
+    <button [routerLink]="['/player-detail', p['id']]" style="margin-top: 10px; padding: 5px 10px; cursor: pointer;">
+      Ver Perfil Completo
+    </button>
   </div>
 </div>
 

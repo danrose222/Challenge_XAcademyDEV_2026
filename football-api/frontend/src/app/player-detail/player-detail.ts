@@ -1,18 +1,19 @@
 import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
-import { PlayerService } from '../services/player/player.service'; // <-- CORREGIDO CON ../
+import { PlayerService } from '../services/player/player.service';
 
-// Importaciones y registro de controladores para Chart.js Radar
+
 import { Chart, RadarController, LinearScale, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [BaseChartDirective, RouterModule],
-  templateUrl: './player-detail.html' // Apunta a tu archivo HTML de al lado
+  imports: [CommonModule, BaseChartDirective, RouterModule],
+  templateUrl: './player-detail.html'
 })
 export class PlayerDetailComponent implements OnInit {
   playerId: string | null = null;
@@ -29,37 +30,42 @@ export class PlayerDetailComponent implements OnInit {
 
   constructor(
     private route: ActivatedRoute,
-    private playerService: PlayerService // Inyección limpia del servicio
+    private playerService: PlayerService 
   ) {}
 
   ngOnInit(): void {
-    this.playerId = this.route.snapshot.paramMap.get('id');
     
-    if (this.playerId) {
-      this.playerService.getPlayerById(this.playerId).subscribe({
-        next: (player: any) => {  
-          this.playerData = player;
-          
-          // Mapeo dinámico de las estadísticas reales que vienen de la base de datos
-          this.radarChartData = {
-            labels: this.radarChartLabels,
-            datasets: [
-              {
-                data: [
-                  player.pace || 0,
-                  player.shooting || 0,
-                  player.passing || 0,
-                  player.dribbling || 0,
-                  player.defending || 0,
-                  player.physical || 0
-                ],
-                label: `Skills de ${player.shortName || player.name || 'Jugador'}`
-              }
-            ]
-          };
-        },
-        error: (err: any) => console.error('Error al traer detalles del jugador:', err)
-      });
-    }
+    this.route.paramMap.subscribe(params => {
+      this.playerId = params.get('id');
+      
+      if (this.playerId) {
+        
+        this.playerData = null; 
+
+        this.playerService.getPlayerById(this.playerId).subscribe({
+          next: (player: any) => {  
+            this.playerData = player;
+            
+            this.radarChartData = {
+              labels: this.radarChartLabels,
+              datasets: [
+                {
+                  data: [
+                    player.pace || 0,
+                    player.shooting || 0,
+                    player.passing || 0,
+                    player.dribbling || 0,
+                    player.defending || 0,
+                    player.physic || 0 //
+                  ],
+                  label: `Skills de ${player.longName || player.name || 'Jugador'}`
+                }
+              ]
+            };
+          },
+          error: (err: any) => console.error('Error al traer detalles del jugador:', err)
+        });
+      }
+    });
   }
 }

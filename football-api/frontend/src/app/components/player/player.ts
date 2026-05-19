@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
 import { PlayerService } from '../../services/player/player.service';
 
 export interface Player {
@@ -10,7 +11,7 @@ export interface Player {
   selector: 'app-player',
   templateUrl: './player.html',
   styleUrls: ['./player.css'],
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   standalone: true
 })
 export class PlayerComponent implements OnInit {

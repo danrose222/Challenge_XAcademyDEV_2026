@@ -1,21 +1,32 @@
-<div style="max-width: 600px; margin: 40px auto; text-align: center; font-family: sans-serif;">
+<div *ngIf="playerData; else loading" style="padding: 20px; font-family: sans-serif;">
   
-  @if (playerData) {
-    <h2>Detalles de: {{ playerData.name }}</h2>
-    <p>Club: {{ playerData.club }} | Posición: {{ playerData.position }}</p>
-  } @else {
-    <h2>Cargando detalles del jugador #{{ playerId }}...</h2>
-  }
-
-  <div style="display: block; margin-top: 30px;">
-    <canvas baseChart
-      [data]="radarChartData"
-      [options]="radarChartOptions"
-      [type]="radarChartType">
-    </canvas>
-  </div>
-
-  <button routerLink="/" style="margin-top: 40px; padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
-    ⬅ Volver al listado
+  <button [routerLink]="['/']" style="margin-bottom: 20px; padding: 10px; cursor: pointer;">
+    ⬅ Volver a la Plantilla
   </button>
+
+  <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
+    
+    <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; min-width: 250px; background-color: #f9f9f9;">
+      <h2 style="margin-top: 0;">{{ playerData.longName || playerData.name }}</h2>
+      
+      <p><strong>Club:</strong> {{ playerData.clubName || playerData.club }}</p>
+      <p><strong>Nacionalidad:</strong> {{ playerData.nationalityName || playerData.nationality }}</p>
+      <p><strong>Rating Global:</strong> {{ playerData.overall }}</p>
+      <p><strong>Potencial:</strong> {{ playerData.potential }}</p>
+      <p><strong>Valor en Mercado:</strong> €{{ playerData.valueEur }}</p>
+    </div>
+
+    <div style="width: 400px; height: 400px;">
+      <canvas baseChart
+        [data]="radarChartData"
+        [options]="radarChartOptions"
+        [type]="radarChartType">
+      </canvas>
+    </div>
+
+  </div>
 </div>
+
+<ng-template #loading>
+  <p style="padding: 20px;">Cargando perfil clasificado del jugador...</p>
+</ng-template>
