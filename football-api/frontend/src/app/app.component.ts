@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PlayerService } from './services/player/player.service';
-
+import { RouterOutlet } from '@angular/router';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, RouterModule, FormsModule, RouterOutlet],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
@@ -16,7 +16,6 @@ export class AppComponent implements OnInit {
   filteredPlayers: any[] = []; 
   searchTerm: string = ''; 
 
-  // Variables de paginación
   currentPage: number = 1;
   totalPages: number = 1;
   totalRecords: number = 0;
@@ -33,7 +32,6 @@ export class AppComponent implements OnInit {
         this.players = response.data || []; 
         this.filteredPlayers = [...this.players]; 
         
-        // Guardamos los datos de paginación
         this.totalPages = response.totalPages || 1;
         this.totalRecords = response.total || 0;
       },

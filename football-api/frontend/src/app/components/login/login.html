@@ -1,0 +1,22 @@
+<div style="max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; font-family: sans-serif;">
+  <h2 style="text-align: center;">Boletería VIP</h2>
+  <p style="text-align: center; color: #666;">Ingresá tus credenciales para obtener acceso.</p>
+
+  <form (ngSubmit)="onSubmit()">
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px;">Usuario:</label>
+      <input type="text" name="username" [(ngModel)]="username" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; margin-bottom: 5px;">Contraseña:</label>
+      <input type="password" name="password" [(ngModel)]="password" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+    </div>
+
+    <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+      Entrar
+    </button>
+  </form>
+
+  <p *ngIf="errorMessage" style="color: red; margin-top: 15px; text-align: center;">{{ errorMessage }}</p>
+</div>
