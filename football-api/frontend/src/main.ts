@@ -7,6 +7,6 @@ bootstrapApplication(AppComponent, {
   ...appConfig,
   providers: [
     ...appConfig.providers!,
-    provideHttpClient(), // 👈 asegurate de tenerlo aquí
+    provideHttpClient(), 
   ],
 });
