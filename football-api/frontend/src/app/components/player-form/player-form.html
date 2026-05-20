@@ -1,0 +1,51 @@
+<div style="max-width: 600px; margin: 30px auto; padding: 20px; font-family: sans-serif; background: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+    <h2 style="margin: 0; color: #333;">Crear Nuevo Jugador</h2>
+    <a routerLink="/" style="text-decoration: none; color: #0056b3; font-weight: bold;">⬅ Volver</a>
+  </div>
+
+  <form [formGroup]="playerForm" (ngSubmit)="onSubmit()">
+    
+    <div style="margin-bottom: 15px;">
+      <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nombre Completo:</label>
+      <input type="text" formControlName="name" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+      <small *ngIf="playerForm.get('name')?.invalid && playerForm.get('name')?.touched" style="color: red;">
+        El nombre es obligatorio y debe tener al menos 3 caracteres.
+      </small>
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+      <div style="flex: 1;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Club:</label>
+        <input type="text" formControlName="club" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+      </div>
+      <div style="flex: 1;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Nacionalidad:</label>
+        <input type="text" formControlName="nationality" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 15px; margin-bottom: 25px;">
+      <div style="flex: 1;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Posición (Ej: ST, CM, GK):</label>
+        <input type="text" formControlName="position" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+      </div>
+      <div style="flex: 1;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Rating (1-99):</label>
+        <input type="number" formControlName="overall" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+      </div>
+      <div style="flex: 1;">
+        <label style="display: block; font-weight: bold; margin-bottom: 5px;">Edad:</label>
+        <input type="number" formControlName="age" style="width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+      </div>
+    </div>
+
+    <button type="submit" [disabled]="playerForm.invalid" style="width: 100%; padding: 12px; background-color: #28a745; color: white; font-weight: bold; border: none; border-radius: 4px; cursor: pointer;">
+      Guardar Jugador
+    </button>
+
+  </form>
+
+  <p *ngIf="successMessage" style="color: green; text-align: center; margin-top: 15px; font-weight: bold;">{{ successMessage }}</p>
+  <p *ngIf="errorMessage" style="color: red; text-align: center; margin-top: 15px; font-weight: bold;">{{ errorMessage }}</p>
+</div>

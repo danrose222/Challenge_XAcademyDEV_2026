@@ -17,6 +17,13 @@ export class PlayerService {
   }
 
   getPlayerById(id: string): Observable<any> {
+
     return this.http.get(`${this.apiUrl}/players/${id}`);
+  }
+
+  
+  createPlayer(playerData: any): Observable<any> {
+    
+    return this.http.post('http://localhost:3000/api/players', playerData);
   }
 }
