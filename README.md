@@ -1,69 +1,31 @@
-# Santex Academy - FootballAPI
+# Football API - Sistema de Gestión de Jugadores
 
-## Pasos para correr
+Este proyecto es una aplicación full-stack diseñada para la gestión, visualización y análisis de datos de jugadores de fútbol. La arquitectura está completamente contenedorizada utilizando Docker, lo que garantiza un entorno de desarrollo consistente y de fácil despliegue.
 
-1. Instalar Docker Desktop: Si no lo tienen, es el primer paso.
-2. Clonar tu repositorio: 
-   
+## 🚀 Arquitectura del Sistema
+
+El proyecto está compuesto por tres servicios principales:
+
+* **Frontend:** Aplicación desarrollada en **Angular** que incluye componentes interactivos, paginación dinámica, gráficos de rendimiento (gráficos de radar) y exportación de datos a formatos legibles como CSV.
+* **Backend:** API REST robusta construida con **NestJS**, encargada de la lógica de negocio, la conexión al ORM y la exposición de los endpoints.
+* **Base de Datos:** Motor **MySQL (v8.0)** para el almacenamiento persistente de los registros de los jugadores.
+
+---
+
+## 🛠️ Requisitos Previos
+
+Antes de comenzar, asegúrate de tener instalado en tu sistema:
+
+* [Docker](https://docs.docker.com/get-docker/) y [Docker Compose](https://docs.docker.com/compose/install/)
+* [Node.js](https://nodejs.org/) (Para desarrollo local o instalación de dependencias fuera del contenedor)
+* Un cliente API como [Postman](https://www.postman.com/) o [Insomnia](https://insomnia.rest/)
+
+---
+
+## 📦 Instalación y Despliegue con Docker
+
+Para levantar todo el entorno (Base de datos, Backend y Frontend) de manera automatizada, sigue estos pasos:
+
+1. Clonar el repositorio e ingresar a la carpeta raíz del proyecto:
    ```bash
-   git clone <URL_DE_TU_REPOSITORIO>
-   ```
-3. Navegar a la carpeta del proyecto:
-    ```bash
-    cd football-api
-   ```
-4. Copiar las variable de entorno del archivo de ejemplo al de ambiente
-    ```bash
-    cp .env.sample .env
-   ```
-5. Levantar todo con: 
-   ```bash
-    docker compose up
-   ```
-
-## Alternativa
-Aca las instruciones para correr cada servicio por separado
-
-### Reiniciar los datos
-
-``` bash
-docker compose down -v # Esto detiene los contenedores y elimina los volúmenes (incluido db_data)
-docker compose up -d   # Esto vuelve a crear todo desde cero, ejecutando init.sql
-```
-
-### Conectarse a MySQL desde el Terminal / Consola
-
-```bash
-mysql -h 127.0.0.1 -P 3306 --user=football_api --password=password football_db
-```
-
-```bash
-mysql> SHOW TABLES;
-```
-
-```bash
-mysql> SELECT * FROM users;
-```
-
-```bash
-mysql> exit;
-```
-
-### Inicializar API
-
-```bash
-$ npm install
-```
-
-### Compilar y correr el BackEnd
-
-```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
-```
+   cd football-api
