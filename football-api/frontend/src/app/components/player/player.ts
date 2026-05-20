@@ -82,4 +82,26 @@ export class PlayerComponent implements OnInit {
 
     window.open('http://localhost:3000/api/players/export', '_blank');
   }
+
+  deletePlayer(id: number): void {
+    if (confirm('¿Estás segura de que querés eliminar a esta jugadora?')) {
+      this.playerService.deletePlayer(id).subscribe({
+        next: () => {
+          
+          this.mostrarNotificacion('Jugador eliminado con éxito');
+          
+          this.cargarJugadores();
+        },
+        error: (err: any) => {
+          console.error('Error al eliminar:', err);
+          this.errorMessage = 'No se pudo eliminar al jugador.';
+        }
+      });
+    }
+  }
+
+  mostrarNotificacion(mensaje: string): void {
+    
+    alert(mensaje); 
+  }
 }

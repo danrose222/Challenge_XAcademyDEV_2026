@@ -35,27 +35,24 @@
       </tr>
     </thead>
     <tbody>
-      <tr *ngFor="let player of filteredPlayers" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 12px;">
-          {{ player.dataValues?.longName || player.longName || player.name }}
-        </td>
-        <td style="padding: 12px;">
-          {{ player.dataValues?.clubName || player.clubName || player.club }}
-        </td>
-        <td style="padding: 12px;">
-          {{ player.dataValues?.nationalityName || player.nationalityName || player.nationality }}
-        </td>
-        <td style="padding: 12px; text-align: center; font-weight: bold; color: #2e7d32;">
-          {{ player.dataValues?.overall || player.overall || player.rating }}
-        </td>
-        <td style="padding: 12px; text-align: center;">
-          {{ player.dataValues?.age || player.age }}
-        </td>
-        <td style="padding: 12px; text-align: center;">
+      <tr *ngFor="let p of filteredPlayers" style="border-bottom: 1px solid #eee;">
+        <td style="padding: 12px;">{{ p.dataValues?.longName || p.longName || p.name }}</td>
+        <td style="padding: 12px;">{{ p.dataValues?.clubName || p.clubName || p.club }}</td>
+        <td style="padding: 12px;">{{ p.dataValues?.nationalityName || p.nationalityName || p.nationality }}</td>
+        <td style="padding: 12px; text-align: center; font-weight: bold; color: #2e7d32;">{{ p.dataValues?.overall || p.overall || p.rating }}</td>
+        <td style="padding: 12px; text-align: center;">{{ p.dataValues?.age || p.age }}</td>
+        
+        <td style="padding: 12px; text-align: center; display: flex; gap: 5px; justify-content: center;">
           <button 
-            [routerLink]="['/player-detail', player.id || player.dataValues?.id]"
+            [routerLink]="['/player-detail', p.id || p.dataValues?.id]"
             style="padding: 6px 12px; background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
             📊 Ver Radar
+          </button>
+          
+          <button 
+            (click)="deletePlayer(p.id || p.dataValues?.id)" 
+            style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
+            🗑️ Eliminar
           </button>
         </td>
       </tr>

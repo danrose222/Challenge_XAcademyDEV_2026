@@ -38,6 +38,7 @@ export class PlayersService {
       where: whereCondition, 
       limit: limit,
       offset: offset,
+      order: [['overall', 'DESC']]
     });
 
     return {
@@ -107,5 +108,13 @@ export class PlayersService {
     }
     
     return player;
+  }
+
+   async remove(id: number): Promise<void> {
+    const player = await this.playerRepository.findByPk(id);
+    if (!player) {
+      throw new Error('Jugador no encontrado');
+    }
+    await player.destroy();
   }
 }

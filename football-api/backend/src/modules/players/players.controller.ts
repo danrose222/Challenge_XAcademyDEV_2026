@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards} from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards, Delete} from '@nestjs/common';
 import { Response } from 'express';
 import { PlayersService } from './players.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth } from '@nestjs/swagger'; 
@@ -90,4 +90,10 @@ export class PlayersController {
   ) {
     return await this.playersService.update(id, updatePlayerDto);
   }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.playersService.remove(+id);
+  }
+  
 }
