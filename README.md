@@ -29,3 +29,5 @@ Para levantar todo el entorno (Base de datos, Backend y Frontend) de manera auto
 1. Clonar el repositorio e ingresar a la carpeta raíz del proyecto:
    ```bash
    cd football-api
+   
+# Challenge_XAcademyDEV_2026
