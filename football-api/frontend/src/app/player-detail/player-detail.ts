@@ -5,7 +5,6 @@ import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { PlayerService } from '../services/player/player.service';
 
-
 import { Chart, RadarController, LinearScale, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
@@ -24,7 +23,12 @@ export class PlayerDetailComponent implements OnInit {
   
   public radarChartData: ChartData<'radar'> = {
     labels: this.radarChartLabels,
-    datasets: [{ data: [0, 0, 0, 0, 0, 0], label: 'Skills del Jugador' }]
+    datasets: [{ 
+      data: [0, 0, 0, 0, 0, 0], 
+      label: 'Skills del Jugador',
+      backgroundColor: 'rgba(0, 86, 179, 0.4)',
+      borderColor: '#0056b3'
+    }]
   };
   public radarChartType: ChartType = 'radar';
 
@@ -34,12 +38,10 @@ export class PlayerDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    
     this.route.paramMap.subscribe(params => {
       this.playerId = params.get('id');
       
       if (this.playerId) {
-        
         this.playerData = null; 
 
         this.playerService.getPlayerById(this.playerId).subscribe({
@@ -56,9 +58,16 @@ export class PlayerDetailComponent implements OnInit {
                     player.passing || 0,
                     player.dribbling || 0,
                     player.defending || 0,
-                    player.physic || 0 //
+                    player.physic || 0 
                   ],
-                  label: `Skills de ${player.longName || player.name || 'Jugador'}`
+                  label: `Skills de ${player.longName || player.name || 'Jugador'}`,
+                
+                  backgroundColor: 'rgba(0, 86, 179, 0.4)',  
+                  borderColor: '#0056b3',                   
+                  pointBackgroundColor: '#28a745',           
+                  pointBorderColor: '#fff',                 
+                  pointHoverBackgroundColor: '#fff',         
+                  pointHoverBorderColor: '#28a745'
                 }
               ]
             };

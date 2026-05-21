@@ -26,7 +26,6 @@ export class PlayersService {
     }
 
     if (name) {
-      
       whereCondition.longName = { [Op.like]: `%${name}%` }; 
     }
 
@@ -41,8 +40,19 @@ export class PlayersService {
       order: [['overall', 'DESC']]
     });
 
+    const datosSaneados = rows.map(p => {
+      
+      const player = p.get({ plain: true }); 
+      
+      if (player.longName) player.longName = this.sanearTexto(player.longName);
+      if (player.clubName) player.clubName = this.sanearTexto(player.clubName);
+      if (player.nationalityName) player.nationalityName = this.sanearTexto(player.nationalityName);
+      
+      return player;
+    });
+
     return {
-      data: rows,
+      data: datosSaneados,
       total: count,
       page: page,
       totalPages: Math.ceil(count / limit)
@@ -57,15 +67,13 @@ export class PlayersService {
     if (name) whereCondition.longName = { [Op.like]: `%${name}%` };
     if (club) whereCondition.clubName = { [Op.like]: `%${club}%` };
 
-    
     const players = await this.playerRepository.findAll({ where: whereCondition });
 
-    
     const dataToExport = players.map(p => ({
       ID: p.id,
-      Nombre: p.longName,
-      Nacionalidad: p.nationalityName,
-      Club: p.clubName,
+      Nombre: this.sanearTexto(p.longName),
+      Nacionalidad: this.sanearTexto(p.nationalityName),
+      Club: this.sanearTexto(p.clubName),
       Posicion: p.playerPositions,
       Valor_Eur: p.valueEur
     }));
@@ -74,14 +82,14 @@ export class PlayersService {
     const workbook = xlsx.utils.book_new();
     xlsx.utils.book_append_sheet(workbook, worksheet, 'Jugadores');
 
-    
     const csvBuffer = xlsx.write(workbook, { type: 'buffer', bookType: 'csv' });
     
-    return csvBuffer;
+    const bom = Buffer.from('\uFEFF', 'utf-8');
+    
+    return Buffer.concat([bom, csvBuffer]);
   }
 
   async update(id: number, updatePlayerDto: UpdatePlayerDto): Promise<any> {
-    
     const player = await this.playerRepository.findByPk(id);
     
     if (!player) {
@@ -89,18 +97,15 @@ export class PlayersService {
     }
 
     await player.update(updatePlayerDto);
-    
     return player;
   }
 
   async create(playerData: any): Promise<any> {
-    
     const newPlayer = await this.playerRepository.create(playerData);
     return newPlayer;
   }
 
   async findOne(id: number): Promise<any> {
-   
     const player = await this.playerRepository.findByPk(id);
     
     if (!player) {
@@ -116,5 +121,14 @@ export class PlayersService {
       throw new Error('Jugador no encontrado');
     }
     await player.destroy();
+  }
+
+  private sanearTexto(texto: string | undefined | null): string {
+    if (!texto) return '';
+    try {
+      return decodeURIComponent(escape(texto));
+    } catch (e) {
+      return texto; 
+    }
   }
 }

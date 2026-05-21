@@ -5,11 +5,28 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth } 
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerDto } from './dto/player.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
+import { AiAnalysisService } from './ai-analysis.service';
 
 @ApiTags('Players') 
 @Controller('players')
 export class PlayersController {
-  constructor(private readonly playersService: PlayersService) {}
+  constructor(
+    private readonly playersService: PlayersService,
+    private readonly aiAnalysisService: AiAnalysisService
+  ) {}
+
+   @Get('analyze/:id')
+   async getPlayerAnalysis(@Param('id', ParseIntPipe) id: number) {
+   const player = await this.playersService.findOne(id);
+  
+  const historial = [
+    { year: 2021, value: player.overall - 2 },
+    { year: 2022, value: player.overall - 1 },
+    { year: 2023, value: player.overall }
+  ];
+
+  return await this.aiAnalysisService.analizarEvolucion(historial);
+}
 
  @Get()
   @ApiOperation({ summary: 'Obtener el listado paginado de jugadores' })
@@ -34,10 +51,8 @@ export class PlayersController {
     
   }
 
-
   @Get('export')
   @ApiOperation({ summary: 'Exportar jugadores filtrados a CSV' })
-
   async exportCsv(
     @Res() res: Response,
     @Query('nationality') nationality?: string,
@@ -48,7 +63,7 @@ export class PlayersController {
     const buffer = await this.playersService.exportCsv(nationality, position, name, club);
     
     res.set({
-      'Content-Type': 'text/csv',
+      'Content-Type': 'text/csv; charset=utf-8',
       'Content-Disposition': 'attachment; filename=jugadores.csv',
     });
     

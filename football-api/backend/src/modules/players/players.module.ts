@@ -5,13 +5,14 @@ import { PlayersService } from './players.service';
 import { SequelizePlayerRepository } from './repositories/sequelize/sequelize-player.repository';
 import { PlayerModel } from './repositories/sequelize/player.model'; 
 import { AuthModule } from '../../auth/auth.module';
+import { AiAnalysisService } from './ai-analysis.service';
 
 @Module({
   
   imports: [AuthModule, SequelizeModule.forFeature([PlayerModel])], 
   controllers: [PlayersController],
   providers: [
-    PlayersService,
+    PlayersService, AiAnalysisService,
     {
       provide: 'PlayerRepository',
       useClass: SequelizePlayerRepository,

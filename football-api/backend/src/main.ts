@@ -1,14 +1,19 @@
 import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  
   app.setGlobalPrefix('api');
   
   app.enableCors();
+
+  app.useGlobalPipes(new ValidationPipe({
+    whitelist: true, 
+    forbidNonWhitelisted: true,
+  }));
 
   const config = new DocumentBuilder()
     .setTitle('API de Control de Jugadores')
@@ -22,7 +27,8 @@ async function bootstrap() {
 
   const document = SwaggerModule.createDocument(app, config);
   
-  SwaggerModule.setup('portal', app, document);
+
+  SwaggerModule.setup('api-docs', app, document);
   
 
   await app.listen(3000);

@@ -12,7 +12,6 @@ export class PlayerService {
   constructor(private http: HttpClient) {}
 
   getPlayers(page: number = 1, limit: number = 20, name?: string, club?: string): Observable<any> {
-    
     let url = `${this.apiUrl}/players?page=${page}&limit=${limit}`;
 
     if (name) {
@@ -27,18 +26,18 @@ export class PlayerService {
   }
 
   getPlayerById(id: string): Observable<any> {
-
     return this.http.get(`${this.apiUrl}/players/${id}`);
   }
 
-  
   createPlayer(playerData: any): Observable<any> {
-    
-    return this.http.post('http://localhost:3000/api/players', playerData);
+    return this.http.post(`${this.apiUrl}/players`, playerData);
   }
 
   deletePlayer(id: number): Observable<any> {
-  
-  return this.http.delete(`http://localhost:3000/api/players/${id}`);
+    return this.http.delete(`${this.apiUrl}/players/${id}`);
+  }
+
+  updatePlayer(id: number, playerData: any): Observable<any> {
+    return this.http.patch(`${this.apiUrl}/players/${id}`, playerData);
   }
 }
