@@ -1,0 +1,40 @@
+<div class="timeline-card">
+  
+  <div class="timeline-header">
+    <div class="title-group">
+      <h3 class="modern-title">Evolución Histórica</h3>
+      <p class="modern-subtitle">Desempeño en EA Sports FC (ex-FIFA)</p>
+    </div>
+    
+    <div class="select-wrapper">
+      <select id="skillSelect" (change)="cambiarHabilidad($event)" class="modern-select">
+        <option value="overall">Rating Global</option>
+        <option value="pace">Ritmo</option>
+        <option value="shooting">Tiro</option>
+        <option value="passing">Pase</option>
+        <option value="dribbling">Regate</option>
+        <option value="defending">Defensa</option>
+        <option value="physic">Físico</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="chart-content">
+    <div *ngIf="cargando" class="loading-state">
+      <p>Actualizando estadísticas...</p>
+    </div>
+
+    <div *ngIf="!cargando && historico.length > 0" class="canvas-container">
+      <canvas baseChart
+        [data]="lineChartData"
+        [options]="lineChartOptions"
+        [type]="'line'">
+      </canvas>
+    </div>
+
+    <div *ngIf="!cargando && historico.length === 0" class="empty-state">
+      <p>No se encontraron registros históricos para buscar tendencias.</p>
+    </div>
+  </div>
+
+</div>

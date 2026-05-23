@@ -29,6 +29,11 @@ export class PlayerService {
     return this.http.get(`${this.apiUrl}/players/${id}`);
   }
 
+  getHistorialJugador(id: number): Observable<any[]> {
+    
+    return this.http.get<any[]>(`http://localhost:3000/api/players/${id}/history`);
+  }
+
   createPlayer(playerData: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/players`, playerData);
   }

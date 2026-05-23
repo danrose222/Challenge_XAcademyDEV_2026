@@ -206,4 +206,23 @@ export class PlayersService {
         });
     });
   }
+
+   async getPlayerHistory(id: number) {
+    const currentPlayer = await this.playerRepository.findOne({ where: { id } });
+    
+    if (!currentPlayer) {
+      throw new NotFoundException(`Jugador con ID ${id} no encontrado`);
+    }
+
+    const history = await this.playerRepository.findAll({
+      where: { 
+        longName: currentPlayer.longName 
+      },
+      order: [
+        ['fifaVersion', 'ASC']
+      ]
+    });
+
+    return history;
+  }
 }

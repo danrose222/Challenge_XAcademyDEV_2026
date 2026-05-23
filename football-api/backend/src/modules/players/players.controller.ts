@@ -107,6 +107,11 @@ export class PlayersController {
     return await this.playersService.update(id, updatePlayerDto);
   }
 
+  @Get(':id/history')
+  async getPlayerHistory(@Param('id') id: string) {
+    return this.playersService.getPlayerHistory(+id);
+  }
+
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.playersService.remove(+id);

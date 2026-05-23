@@ -4,14 +4,15 @@ import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ChartConfiguration, ChartData, ChartType } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { PlayerService } from '../services/player/player.service';
-
 import { Chart, RadarController, LinearScale, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend } from 'chart.js';
+import { PlayerTimelineComponent } from '../components/player-timeline/player-timeline';
 Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+
 
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, RouterModule],
+  imports: [CommonModule, BaseChartDirective, RouterModule, PlayerTimelineComponent ],
   templateUrl: './player-detail.html'
 })
 export class PlayerDetailComponent implements OnInit {
