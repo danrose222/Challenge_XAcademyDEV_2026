@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards, Delete} from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards, Delete, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { PlayersService } from './players.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth } from '@nestjs/swagger'; 
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger'; 
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerDto } from './dto/player.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
@@ -110,5 +111,32 @@ export class PlayersController {
   remove(@Param('id') id: string) {
     return this.playersService.remove(+id);
   }
-  
+
+@Post('import')
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({                          
+    schema: {
+      type: 'object',
+      properties: {
+        file: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+@UseInterceptors(FileInterceptor('file', {
+    limits: {
+      fileSize: 500 * 1024 * 1024,
+    },
+  }))
+  async uploadFile(@UploadedFile() file: any) {
+    console.log('🚩 ¡El controlador recibió una petición POST a /import!');
+    console.log('📦 Estado del archivo:', file ? 'Archivo recibido correctamente' : 'El archivo es undefined/nulo');
+
+    if (!file) {
+      throw new Error('No se subió ningún archivo.');
+    }
+    return await this.playersService.importarDesdeCsv(file);
+  }
 }

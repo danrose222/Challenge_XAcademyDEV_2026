@@ -4,6 +4,9 @@ import { PlayerModel } from './repositories/sequelize/player.model';
 import { Op } from 'sequelize'; 
 import * as xlsx from 'xlsx';
 import { UpdatePlayerDto } from './dto/update-player.dto';
+// @ts-ignore
+import * as csv from 'csv-parser';
+import { Readable } from 'stream';
 
 @Injectable()
 export class PlayersService {
@@ -130,5 +133,77 @@ export class PlayersService {
     } catch (e) {
       return texto; 
     }
+  }
+
+  async importarDesdeCsv(file: any): Promise<any> {
+    console.log('⚙️ Iniciando lectura por Streaming (Flujo de datos)...');
+
+    return new Promise((resolve, reject) => {
+      const jugadoresAInsertar: any[] = [];
+      const stream = Readable.from(file.buffer);
+
+      stream
+        .pipe(csv())
+        .on('data', (row) => {
+          jugadoresAInsertar.push({
+            fifaVersion: row['fifa_version'],
+            fifaUpdate: row['fifa_update'],
+            playerFaceUrl: row['player_face_url'],
+            longName: row['long_name'],
+            playerPositions: row['player_positions'],
+            clubName: row['club_name'],
+            nationalityName: row['nationality_name'],
+            overall: row['overall'],
+            potential: row['potential'],
+            valueEur: row['value_eur'],
+            wageEur: row['wage_eur'],
+            age: row['age'],
+            heightCm: row['height_cm'],
+            weightKg: row['weight_kg'],
+            preferredFoot: row['preferred_foot'],
+            weakFoot: row['weak_foot'],
+            skillMoves: row['skill_moves'],
+            internationalReputation: row['international_reputation'],
+            workRate: row['work_rate'],
+            bodyType: row['body_type'],
+            pace: row['pace'],
+            shooting: row['shooting'],
+            passing: row['passing'],
+            dribbling: row['dribbling'],
+            defending: row['defending'],
+            physic: row['physic'],
+          });
+        })
+        .on('end', async () => {
+          console.log(`✅ Lectura veloz terminada: ${jugadoresAInsertar.length} jugadores encontrados. Guardando en MySQL...`);
+          
+          try {
+
+            const tamañoLote = 1000;
+            let insertados = 0;
+
+            for (let i = 0; i < jugadoresAInsertar.length; i += tamañoLote) {
+              const lote = jugadoresAInsertar.slice(i, i + tamañoLote);
+              
+              await this.playerRepository.bulkCreate(lote as any[], {
+                logging: false,
+                ignoreDuplicates: true,
+              });
+              
+              insertados += lote.length;
+              console.log(`Progreso de carga: ${insertados} jugadores guardados...`);
+            }
+            
+            resolve({ mensaje: `¡Misión cumplida! ${insertados} jugadores procesados por streaming y guardados.` });
+          } catch (error) {
+            console.error('Error guardando en la BD:', error);
+            reject(new Error('Falló la inserción en la base de datos.'));
+          }
+        })
+        .on('error', (error) => {
+          console.error('Error al leer el stream del CSV:', error);
+          reject(new Error('Falló la lectura del archivo.'));
+        });
+    });
   }
 }
