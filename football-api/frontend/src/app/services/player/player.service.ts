@@ -11,6 +11,10 @@ export class PlayerService {
 
   constructor(private http: HttpClient) {}
 
+  analizarEvolucion(id: number): Observable<string> {
+    return this.http.get(`${this.apiUrl}/players/analyze/${id}`, { responseType: 'text' });
+  }
+
   getPlayers(page: number = 1, limit: number = 20, name?: string, club?: string): Observable<any> {
     let url = `${this.apiUrl}/players?page=${page}&limit=${limit}`;
 

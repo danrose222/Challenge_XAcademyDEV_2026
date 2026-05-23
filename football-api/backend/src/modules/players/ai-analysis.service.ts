@@ -18,8 +18,7 @@ export class AiAnalysisService {
   async analizarEvolucion(historial: { year: number, value: number }[]): Promise<string> {
     try {
       
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      
+      const model = this.genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });    
       const prompt = `Analiza la siguiente trayectoria de habilidades de un jugador de FIFA: ${JSON.stringify(historial)}. 
       Identifica picos, declives o transiciones importantes y devuelve un párrafo resumen profesional y conciso sobre su evolución.`;
 

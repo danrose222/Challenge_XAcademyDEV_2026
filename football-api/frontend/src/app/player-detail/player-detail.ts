@@ -12,16 +12,17 @@ Chart.register(RadarController, RadialLinearScale, PointElement, LineElement, Fi
 @Component({
   selector: 'app-player-detail',
   standalone: true,
-  imports: [CommonModule, BaseChartDirective, RouterModule, PlayerTimelineComponent ],
+  imports: [CommonModule, BaseChartDirective, RouterModule, PlayerTimelineComponent],
   templateUrl: './player-detail.html'
 })
 export class PlayerDetailComponent implements OnInit {
+  analisisIA: string = '';
+  cargandoAnalisis: boolean = false;
   playerId: string | null = null;
   playerData: any = null; 
 
   public radarChartOptions: ChartConfiguration['options'] = { responsive: true };
   public radarChartLabels: string[] = ['Ritmo', 'Tiro', 'Pase', 'Regate', 'Defensa', 'Físico'];
-  
   public radarChartData: ChartData<'radar'> = {
     labels: this.radarChartLabels,
     datasets: [{ 
@@ -75,6 +76,25 @@ export class PlayerDetailComponent implements OnInit {
           },
           error: (err: any) => console.error('Error al traer detalles del jugador:', err)
         });
+      }
+    });
+  }
+
+ obtenerAnalisisIA() {
+    
+    if (!this.playerId) return;
+
+    this.cargandoAnalisis = true; 
+    this.analisisIA = ''; 
+    this.playerService.analizarEvolucion(Number(this.playerId)).subscribe({
+      next: (resultado) => {
+        this.analisisIA = resultado; 
+        this.cargandoAnalisis = false; 
+      },
+      error: (err) => {
+        console.error('Error obteniendo análisis de IA', err);
+        this.analisisIA = 'Hubo un error al intentar consultar a la IA. Por favor, intenta de nuevo.';
+        this.cargandoAnalisis = false;
       }
     });
   }
