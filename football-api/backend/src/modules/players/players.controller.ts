@@ -7,6 +7,7 @@ import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerDto } from './dto/player.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { AiAnalysisService } from './ai-analysis.service';
+import { CreatePlayerDto } from './dto/create-player.dto';
 
 @ApiTags('Players') 
 @Controller('players')
@@ -15,6 +16,11 @@ export class PlayersController {
     private readonly playersService: PlayersService,
     private readonly aiAnalysisService: AiAnalysisService
   ) {}
+
+  @Post()
+async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
+  return this.playersService.create(createPlayerDto);
+}
 
    @Get('analyze/:id')
    async getPlayerAnalysis(@Param('id', ParseIntPipe) id: number) {

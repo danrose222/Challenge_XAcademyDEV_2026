@@ -32,31 +32,39 @@ export class PlayerFormComponent implements OnInit {
     });
   }
 
-    onSubmit(): void {
+  onSubmit(): void {
     if (this.playerForm.valid) {
       const formValues = this.playerForm.value;
-
       const payload = {
         longName: formValues.name,
         clubName: formValues.club,
         nationalityName: formValues.nationality,
         playerPositions: formValues.position,
-        overall: formValues.overall,
-        age: formValues.age,
-        fifaVersion: '23',
-        fifaUpdate: '9',
+        overall: Number(formValues.overall),
+        age: Number(formValues.age),   
+        fifaVersion: 23, 
+        fifaUpdate: 9,
         playerFaceUrl: 'https://cdn.sofifa.net/players/notfound_0_120.png',
-        potential: formValues.overall
+        potential: Number(formValues.overall)
       };
 
       this.playerService.createPlayer(payload).subscribe({
         next: () => {
+          this.errorMessage = '';
           this.successMessage = '¡Fichaje exitoso! Jugadora creada correctamente.';
-          setTimeout(() => this.router.navigate(['/']), 2000);
+         
+          setTimeout(() => this.router.navigate(['/']), 2000); 
         },
-        error: (err: any) => {
+        error: (err) => {
           console.error('Error al crear:', err);
-          this.errorMessage = 'Hubo un error al guardar. Revisa la consola.';
+          this.successMessage = '';
+          
+          if (err.error && err.error.message) {
+            console.error('🚨 MOTIVOS DEL RECHAZO:', err.error.message);
+            this.errorMessage = 'Error del servidor: Revisa la consola para más detalles.';
+          } else {
+            this.errorMessage = 'Error de conexión. ¿Está levantado el backend?';
+          }
         }
       });
     } else {
