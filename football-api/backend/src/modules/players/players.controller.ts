@@ -1,8 +1,8 @@
-import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards, Delete, UseInterceptors, UploadedFile} from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe, Res, Patch, Body, Post, UseGuards, Delete, UseInterceptors, UploadedFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { PlayersService } from './players.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth, ApiConsumes } from '@nestjs/swagger'; 
+import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiBody, ApiBearerAuth, ApiConsumes, ApiParam } from '@nestjs/swagger'; 
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayerDto } from './dto/player.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
@@ -17,25 +17,43 @@ export class PlayersController {
     private readonly aiAnalysisService: AiAnalysisService
   ) {}
 
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard)
   @Post()
-async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
-  return this.playersService.create(createPlayerDto);
-}
+  @ApiOperation({ 
+    summary: 'Crear un jugador nuevo en la base de datos',
+    description: 'Registra un nuevo futbolista en el sistema. Requiere un token JWT válido en las cabeceras de la petición.'
+  })
+  @ApiBody({ type: CreatePlayerDto, description: 'Datos del nuevo jugador a registrar' }) 
+  @ApiResponse({ status: 201, description: 'Jugador creado exitosamente.' })
+  @ApiResponse({ status: 400, description: 'Datos de entrada inválidos o mal formateados.' })
+  @ApiResponse({ status: 401, description: 'No autorizado. Token JWT faltante o expirado.' })
+  async create(@Body() createPlayerDto: CreatePlayerDto) {
+    return await this.playersService.create(createPlayerDto);
+  }
 
-   @Get('analyze/:id')
-   async getPlayerAnalysis(@Param('id', ParseIntPipe) id: number) {
-   const player = await this.playersService.findOne(id);
-  
-  const historial = [
-    { year: 2021, value: player.overall - 2 },
-    { year: 2022, value: player.overall - 1 },
-    { year: 2023, value: player.overall }
-  ];
+  @Get('analyze/:id')
+  @ApiOperation({ 
+    summary: 'Generar diagnóstico de IA para un jugador',
+    description: 'Se comunica con el modelo Gemini 2.5 Flash para analizar la evolución histórica de un jugador basándose en sus estadísticas de FIFA y retorna un diagnóstico detallado.'
+  })
+  @ApiParam({ name: 'id', description: 'El identificador único numérico del jugador en la base de datos', type: 'number', example: 16183 })
+  @ApiResponse({ status: 200, description: 'Diagnóstico generado exitosamente.' })
+  @ApiResponse({ status: 404, description: 'Jugador no encontrado en la base de datos.' })
+  @ApiResponse({ status: 500, description: 'Error de conexión con el servicio de IA.' })
+  async getPlayerAnalysis(@Param('id', ParseIntPipe) id: number) {
+    const player = await this.playersService.findOne(id);
+    
+    const historial = [
+      { year: 2021, value: player.overall - 2 },
+      { year: 2022, value: player.overall - 1 },
+      { year: 2023, value: player.overall }
+    ];
 
-  return await this.aiAnalysisService.analizarEvolucion(historial);
-}
+    return await this.aiAnalysisService.analizarEvolucion(historial);
+  }
 
- @Get()
+  @Get()
   @ApiOperation({ summary: 'Obtener el listado paginado de jugadores' })
   @ApiQuery({ name: 'page', required: false, description: 'Número de página a consultar', example: 1 })
   @ApiQuery({ name: 'limit', required: false, description: 'Cantidad de registros por página', example: 10 })
@@ -44,7 +62,6 @@ async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
   @ApiQuery({ name: 'name', required: false, description: 'Buscar por nombre parcial (Ej: Messi)' })
   @ApiQuery({ name: 'club', required: false, description: 'Buscar por club parcial (Ej: Paris)' })
   @ApiResponse({ status: 200, description: 'Listado de jugadores devuelto con éxito.' })
-
   async findAll(
     @Query('page', new ParseIntPipe({ optional: true })) page = 1,
     @Query('limit', new ParseIntPipe({ optional: true })) limit = 20,
@@ -53,9 +70,7 @@ async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
     @Query('name') name?: string,
     @Query('club') club?: string,
   ) {
-
     return await this.playersService.findAll(page, limit, nationality, position, name, club);
-    
   }
 
   @Get('export')
@@ -77,24 +92,10 @@ async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
     res.send(buffer);
   }
 
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard)
-  @Post()
-  @ApiOperation({ summary: 'Crear un jugador nuevo en la base de datos' })
-  @ApiBody({ type: PlayerDto, description: 'Datos del nuevo jugador' }) 
-  @ApiResponse({ status: 201, description: 'Jugador creado exitosamente.' })
-
-  async create(
-  
-    @Body() playerData: PlayerDto) {
-    return await this.playersService.create(playerData);
-  }
-
   @Get(':id')
   @ApiOperation({ summary: 'Obtener un jugador específico por su identificador único (ID)' })
   @ApiResponse({ status: 200, description: 'Jugador encontrado y mapeado con éxito.' })
   @ApiResponse({ status: 404, description: 'El ID ingresado no corresponde a ningún jugador en la base de datos.' })
-
   async findOne(@Param('id', ParseIntPipe) id: number) {
     return this.playersService.findOne(id);
   }
@@ -105,7 +106,6 @@ async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
   @ApiOperation({ summary: 'Editar la información de un jugador existente' })
   @ApiBody({ type: UpdatePlayerDto, description: 'Datos a modificar del jugador' })
   @ApiResponse({ status: 200, description: 'Jugador actualizado con éxito.' })
-
   async update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updatePlayerDto: UpdatePlayerDto,
@@ -114,16 +114,23 @@ async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
   }
 
   @Get(':id/history')
+  @ApiOperation({ summary: 'Obtener el historial de un jugador' })
+  @ApiParam({ name: 'id', description: 'ID del jugador', type: 'string' })
+  @ApiResponse({ status: 200, description: 'Historial devuelto con éxito.' })
   async getPlayerHistory(@Param('id') id: string) {
     return this.playersService.getPlayerHistory(+id);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar un jugador de la base de datos' })
+  @ApiParam({ name: 'id', description: 'ID del jugador a eliminar', type: 'string' })
+  @ApiResponse({ status: 200, description: 'Jugador eliminado con éxito.' })
   remove(@Param('id') id: string) {
     return this.playersService.remove(+id);
   }
 
-@Post('import')
+  @Post('import')
+  @ApiOperation({ summary: 'Importar lista de jugadores masivamente vía CSV' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({                          
     schema: {
@@ -136,7 +143,7 @@ async createPlayer(@Body() createPlayerDto: CreatePlayerDto) {
       },
     },
   })
-@UseInterceptors(FileInterceptor('file', {
+  @UseInterceptors(FileInterceptor('file', {
     limits: {
       fileSize: 500 * 1024 * 1024,
     },
