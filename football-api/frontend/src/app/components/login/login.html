@@ -1,22 +1,64 @@
-<div style="max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ccc; border-radius: 8px; font-family: sans-serif;">
-  <h2 style="text-align: center;">Boletería VIP</h2>
-  <p style="text-align: center; color: #666;">Ingresá tus credenciales para obtener acceso.</p>
+<style>
+  
+  .login-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    font-family: 'Segoe UI', sans-serif;
+    padding: 20px;
+  }
 
-  <form (ngSubmit)="onSubmit()">
-    <div style="margin-bottom: 15px;">
-      <label style="display: block; margin-bottom: 5px;">Usuario:</label>
-      <input type="text" name="username" [(ngModel)]="username" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+  .login-card {
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+  }
+
+  h2 { color: #333; margin-bottom: 8px; }
+  .subtitle { color: #888; margin-bottom: 25px; font-size: 0.9em; }
+
+  .input-group { text-align: left; margin-bottom: 20px; }
+  label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
+  
+  input { 
+    width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; 
+    box-sizing: border-box; transition: border-color 0.3s;
+  }
+  input:focus { border-color: #28a745; outline: none; }
+
+  button { 
+    width: 100%; padding: 14px; background: #28a745; color: white; 
+    border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer;
+    transition: background 0.3s;
+  }
+  button:hover { background: #218838; }
+</style>
+
+<div class="login-wrapper">
+  <form (ngSubmit)="onSubmit()" class="login-card">
+    <h2>Boletería VIP</h2>
+    <p class="subtitle">Ingresá tus credenciales para continuar</p>
+
+    <div class="input-group">
+      <label>Usuario</label>
+      <input type="text" name="username" [(ngModel)]="username" required placeholder="tu_usuario">
     </div>
 
-    <div style="margin-bottom: 15px;">
-      <label style="display: block; margin-bottom: 5px;">Contraseña:</label>
-      <input type="password" name="password" [(ngModel)]="password" required style="width: 100%; padding: 8px; box-sizing: border-box;">
+    <div class="input-group">
+      <label>Contraseña</label>
+      <input type="password" name="password" [(ngModel)]="password" required placeholder="••••••••">
     </div>
 
-    <button type="submit" style="width: 100%; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-      Entrar
-    </button>
+    <button type="submit">Iniciar Sesión</button>
+
+    <p *ngIf="errorMessage" style="color: #dc3545; margin-top: 15px; font-size: 0.85em;">
+      {{ errorMessage }}
+    </p>
   </form>
-
-  <p *ngIf="errorMessage" style="color: red; margin-top: 15px; text-align: center;">{{ errorMessage }}</p>
 </div>

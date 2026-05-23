@@ -8,7 +8,7 @@ import { AuthService } from '../../services/player/auth/auth.service';
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
-  templateUrl: './login.html'
+  templateUrl: './login.html',
 })
 export class LoginComponent {
   username = '';
