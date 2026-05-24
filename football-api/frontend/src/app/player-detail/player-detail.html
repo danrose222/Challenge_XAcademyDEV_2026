@@ -1,51 +1,299 @@
-<div *ngIf="playerData; else loading" style="padding: 20px;">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap');
+
+  .dashboard-wrapper {
+    --fifa-bg-dark: #0b132b;
+    --fifa-card-bg: rgba(28, 37, 65, 0.4);
+    --fifa-accent: #00ff87;
+    --fifa-accent-hover: #00d470;
+    --text-main: #ffffff;
+    --text-muted: #8da9c4;
+    --fut-gold: #f6d365;
+    --font-title: 'Oswald', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+    --font-mono: 'Courier New', Courier, monospace; 
+
+    background-color: var(--fifa-bg-dark);
+    background-image: radial-gradient(circle at 50% 0%, #1c2541 0%, var(--fifa-bg-dark) 70%);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    padding: 30px;
+    box-sizing: border-box;
+    color: var(--text-main);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    color: var(--text-muted);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover {
+    border-color: var(--fifa-accent);
+    color: var(--fifa-accent);
+  }
+
+  .glass-panel {
+    background: var(--fifa-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .player-hero {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  .hero-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid var(--fifa-accent);
+    box-shadow: 0 0 20px rgba(0, 255, 135, 0.3);
+    object-fit: cover;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .hero-info h1 {
+    font-family: var(--font-title);
+    font-size: 3rem;
+    margin: 0 0 5px 0;
+    text-transform: uppercase;
+    line-height: 1;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+  }
+
+  .hero-info h3 {
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    margin: 0 0 15px 0;
+    font-weight: 400;
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 15px;
+  }
+
+  .badge {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-family: var(--font-title);
+    font-size: 1.1rem;
+  }
+
+  .badge.rating {
+    border-color: var(--fifa-accent);
+    color: var(--fifa-accent);
+    font-weight: 700;
+  }
+
+  .charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+  }
+
+  .panel-title {
+    font-family: var(--font-title);
+    font-size: 1.5rem;
+    text-transform: uppercase;
+    color: var(--fut-gold);
+    margin: 0 0 20px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+  }
+
+  .chart-container {
+    position: relative;
+    width: 100%;
+    height: 350px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .ai-section {
+    border-left: 4px solid var(--fifa-accent);
+  }
+
+  .btn-ia {
+    background: var(--fifa-accent);
+    color: var(--fifa-bg-dark);
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.3s;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 15px rgba(0, 255, 135, 0.3);
+  }
+
+  .btn-ia:hover:not(:disabled) {
+    background: var(--fifa-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 135, 0.5);
+  }
+
+  .btn-ia:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .ai-terminal {
+    background: #050a15;
+    border: 1px solid rgba(0, 255, 135, 0.3);
+    border-radius: 8px;
+    padding: 20px;
+    margin-top: 20px;
+    min-height: 100px;
+    font-family: var(--font-mono);
+    color: var(--fifa-accent);
+    line-height: 1.6;
+    font-size: 0.95rem;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-terminal::after {
+    content: '_';
+    animation: blink 1s step-start infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0,0,0,0.3);
+    border-radius: 50%;
+    border-top-color: var(--fifa-bg-dark);
+    animation: spin 1s ease-in-out infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  @media (max-width: 900px) {
+    .charts-grid {
+      grid-template-columns: 1fr;
+    }
+    .player-hero {
+      flex-direction: column;
+      text-align: center;
+    }
+    .hero-badges {
+      justify-content: center;
+    }
+  }
+</style>
+
+<div class="dashboard-wrapper">
   
-  <button [routerLink]="['/']" style="margin-bottom: 20px; padding: 10px; cursor: pointer;">
-    ⬅ Volver a la Plantilla
-  </button>
-
-  <div style="display: flex; gap: 40px; align-items: flex-start; flex-wrap: wrap;">
-    
-    <div style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; min-width: 250px; background-color: #f9f9f9;">
-      <h2 style="margin-top: 0;">{{ playerData.longName || playerData.name }}</h2>
-      <p><strong>Club:</strong> {{ playerData.clubName || playerData.club }}</p>
-      <p><strong>Nacionalidad:</strong> {{ playerData.nationalityName || playerData.nationality }}</p>
-      <p><strong>Rating Global:</strong> {{ playerData.overall }}</p>
-      <p><strong>Potencial:</strong> {{ playerData.potential }}</p>
-      <p><strong>Valor en Mercado:</strong> €{{ playerData.valueEur }}</p>
-    </div>
-
-    <div style="width: 400px; height: 400px;">
-      <canvas baseChart
-        [data]="radarChartData"
-        [options]="radarChartOptions"
-        [type]="radarChartType">
-      </canvas>
-    </div>
+  <div class="section-header">
+    <button routerLink="/" class="btn-outline">⬅ Volver al Plantel</button>
   </div>
 
-  <div class="historial-wrapper" style="margin-top: 40px;">
+  <div *ngIf="!playerData" style="text-align: center; padding: 50px; color: var(--text-muted);">
+    Cargando perfil técnico...
+  </div>
 
-    <app-player-timeline [playerId]="playerData.id"></app-player-timeline>
-
-    <div class="ai-analysis-container" style="margin-top: 20px;">
-      <h3>🔍 Diagnóstico del Coach IA</h3>
+  <ng-container *ngIf="playerData">
+    
+    <div class="glass-panel player-hero">
+      <img [src]="playerData.playerFaceUrl || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'" 
+           alt="{{ playerData.longName }}" class="hero-avatar">
       
-      <button (click)="obtenerAnalisisIA()" [disabled]="cargandoAnalisis" class="btn-ia">
-        {{ cargandoAnalisis ? 'Analizando datos...' : 'Generar diagnóstico con IA' }}
-      </button>
-
-      <div *ngIf="analisisIA" class="ai-result-box">
-        <p>{{ analisisIA }}</p>
+      <div class="hero-info">
+        <h1>{{ playerData.longName || playerData.name }}</h1>
+        <h3>{{ playerData.clubName || playerData.club }} • {{ playerData.nationalityName || playerData.nationality }}</h3>
+        
+        <div class="hero-badges">
+          <span class="badge rating">OVR {{ playerData.overall || playerData.rating }}</span>
+          <span class="badge">{{ playerData.playerPositions || playerData.position || 'N/A' }}</span>
+          <span class="badge">{{ playerData.age }} Años</span>
+        </div>
       </div>
     </div>
+
+    <div class="charts-grid">
+      
+      <div class="glass-panel">
+        <h2 class="panel-title">Radar de Habilidades</h2>
+        <div class="chart-container">
+          <canvas baseChart
+            [data]="radarChartData"
+            [options]="radarChartOptions"
+            [type]="radarChartType">
+          </canvas>
+        </div>
+      </div>
+
+      <div class="glass-panel">
+  <h2 class="panel-title">Evolución Histórica</h2>
+  <div class="chart-container" style="display: block; height: auto;">
+    
+    <app-player-timeline [playerId]="playerIdNum"></app-player-timeline>
     
   </div>
-
 </div>
 
-<ng-template #loading>
-  <div style="padding: 20px;">
-    <p>Cargando información del jugador...</p>
-  </div>
-</ng-template>
+    </div>
+
+    <div class="glass-panel ai-section">
+      <h2 class="panel-title" style="color: var(--fifa-accent);">Diagnóstico Predictivo (Coach IA)</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px;">
+        Genera un análisis cualitativo basado en la evolución histórica y estadísticas actuales mediante Gemini 2.5 Flash.
+      </p>
+
+      <button class="btn-ia" (click)="obtenerAnalisisIA()" [disabled]="cargandoAnalisis">
+        <div class="spinner" *ngIf="cargandoAnalisis"></div>
+        {{ cargandoAnalisis ? 'Analizando Datos...' : 'Generar Reporte IA' }}
+      </button>
+
+      <div class="ai-terminal" *ngIf="analisisIA || cargandoAnalisis">
+        <span *ngIf="cargandoAnalisis">Estableciendo conexión segura con Google Generative AI...<br>Procesando dataset histórico...</span>
+        <span *ngIf="analisisIA" [innerHTML]="analisisIA"></span>
+      </div>
+    </div>
+
+  </ng-container>
+
+</div>

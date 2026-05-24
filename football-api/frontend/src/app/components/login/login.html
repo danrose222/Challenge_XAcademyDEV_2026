@@ -1,64 +1,157 @@
 <style>
-  
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap');
+
   .login-wrapper {
+    --fifa-bg-dark: #0b132b;
+    --fifa-card-bg: rgba(28, 37, 65, 0.6);
+    --fifa-accent: #00ff87;
+    --fifa-accent-hover: #00d470;
+    --text-main: #ffffff;
+    --text-muted: #8da9c4;
+    --font-title: 'Oswald', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+
     display: flex;
     align-items: center;
     justify-content: center;
     min-height: 100vh;
-    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
-    font-family: 'Segoe UI', sans-serif;
+    background-color: var(--fifa-bg-dark);
+    background-image: radial-gradient(circle at 50% 0%, #1c2541 0%, var(--fifa-bg-dark) 70%);
+    font-family: var(--font-body);
     padding: 20px;
+    box-sizing: border-box;
+    color: var(--text-main);
   }
 
-  .login-card {
-    background: #ffffff;
-    padding: 40px;
+  .login-glass-card {
+    background: var(--fifa-card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+    padding: 40px;
     width: 100%;
     max-width: 400px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
     text-align: center;
   }
 
-  h2 { color: #333; margin-bottom: 8px; }
-  .subtitle { color: #888; margin-bottom: 25px; font-size: 0.9em; }
-
-  .input-group { text-align: left; margin-bottom: 20px; }
-  label { display: block; margin-bottom: 8px; color: #555; font-weight: 600; }
-  
-  input { 
-    width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; 
-    box-sizing: border-box; transition: border-color 0.3s;
+  .brand-header h1 {
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    font-size: 2.5rem;
+    margin: 0 0 5px 0;
+    letter-spacing: 1px;
   }
-  input:focus { border-color: #28a745; outline: none; }
 
-  button { 
-    width: 100%; padding: 14px; background: #28a745; color: white; 
-    border: none; border-radius: 8px; font-size: 1em; font-weight: bold; cursor: pointer;
-    transition: background 0.3s;
+  .highlight {
+    color: var(--fifa-accent);
   }
-  button:hover { background: #218838; }
+
+  .brand-header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0 0 30px 0;
+  }
+
+  .fifa-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+
+  .input-group label {
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 5px;
+    letter-spacing: 0.5px;
+  }
+
+  .input-group input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 12px 15px;
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+
+  .input-group input:focus {
+    border-color: var(--fifa-accent);
+    box-shadow: 0 0 8px rgba(0, 255, 135, 0.2);
+  }
+
+  .fifa-btn {
+    background-color: var(--fifa-accent);
+    color: var(--fifa-bg-dark);
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 255, 135, 0.3);
+    letter-spacing: 1px;
+    width: 100%;
+  }
+
+  .fifa-btn:hover {
+    background-color: var(--fifa-accent-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 255, 135, 0.4);
+  }
+
+  .error-message {
+    color: #ff4d4d;
+    background: rgba(255, 77, 77, 0.1);
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 77, 77, 0.3);
+    margin-top: 15px;
+    font-size: 0.85em;
+  }
 </style>
 
 <div class="login-wrapper">
-  <form (ngSubmit)="onSubmit()" class="login-card">
-    <h2>Boletería VIP</h2>
-    <p class="subtitle">Ingresá tus credenciales para continuar</p>
-
-    <div class="input-group">
-      <label>Usuario</label>
-      <input type="text" name="username" [(ngModel)]="username" required placeholder="tu_usuario">
+  <div class="login-glass-card">
+    <div class="brand-header">
+      <h1>XACADEMY <span class="highlight">FC</span></h1>
+      <p>Panel de Gestión Técnica</p>
     </div>
 
-    <div class="input-group">
-      <label>Contraseña</label>
-      <input type="password" name="password" [(ngModel)]="password" required placeholder="••••••••">
-    </div>
+    <form (ngSubmit)="onSubmit()" class="fifa-form">
 
-    <button type="submit">Iniciar Sesión</button>
+      <div class="input-group">
+        <label>Usuario</label>
+        <input type="text" name="username" [(ngModel)]="username" required placeholder="tu_usuario">
+      </div>
 
-    <p *ngIf="errorMessage" style="color: #dc3545; margin-top: 15px; font-size: 0.85em;">
-      {{ errorMessage }}
-    </p>
-  </form>
+      <div class="input-group">
+        <label>Contraseña</label>
+        <input type="password" name="password" [(ngModel)]="password" required placeholder="••••••••">
+      </div>
+
+      <button type="submit" class="fifa-btn">INICIAR SESIÓN</button>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+      
+    </form>
+  </div>
 </div>

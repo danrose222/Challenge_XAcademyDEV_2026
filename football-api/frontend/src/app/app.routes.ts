@@ -15,10 +15,10 @@ export const routes: Routes = [
     component: LoginComponent 
   },
   { 
-    path: 'player-detail/:id', 
-    component: PlayerDetailComponent 
+    path: 'player-detail/:id', component: PlayerDetailComponent,
   },
-  { 
+  
+  {
     path: 'create-player', 
     component: PlayerFormComponent 
   }

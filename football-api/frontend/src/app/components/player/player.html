@@ -1,138 +1,388 @@
-<div class="container" style="margin-width: 100%; max-width: 1200px; margin: 20px auto; padding: 0 15px; font-family: sans-serif;">
-  <h2>Lista de Jugadores (Total en pantalla: {{ filteredPlayers.length }})</h2>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;600;700&family=Roboto:wght@300;400;500&display=swap');
 
-  <div *ngIf="isEditing" style="background-color: #e9ecef; padding: 20px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #ced4da;">
-    <h3 style="margin-top: 0; color: #0056b3;">✏️ Editar Información del Jugador</h3>
+  .dashboard-wrapper {
+    --fifa-bg-dark: #0b132b;
+    --fifa-card-bg: rgba(28, 37, 65, 0.4);
+    --fifa-accent: #00ff87;
+    --fifa-accent-hover: #00d470;
+    --text-main: #ffffff;
+    --text-muted: #8da9c4;
+    --fut-gold: #f6d365;
+    --danger-red: #ff4d4d;
+    --font-title: 'Oswald', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+
+    background-color: var(--fifa-bg-dark);
+    background-image: radial-gradient(circle at 50% 0%, #1c2541 0%, var(--fifa-bg-dark) 70%);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    padding: 30px;
+    box-sizing: border-box;
+    color: var(--text-main);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 15px;
+  }
+
+  .section-header h2 {
+    font-family: var(--font-title);
+    font-size: 2.2rem;
+    text-transform: uppercase;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+
+  .btn-outline {
+    background: transparent;
+    border: 1px solid var(--fifa-accent);
+    color: var(--fifa-accent);
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-size: 1rem;
+    text-decoration: none;
+  }
+
+  .btn-outline:hover {
+    background: var(--fifa-accent);
+    color: var(--fifa-bg-dark);
+    box-shadow: 0 0 15px rgba(0, 255, 135, 0.3);
+  }
+
+  .glass-panel {
+    background: var(--fifa-card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 30px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+  }
+
+  .flex-row {
+    display: flex;
+    gap: 15px;
+    align-items: flex-end;
+  }
+
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .input-group label {
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .fifa-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 10px 12px;
+    border-radius: 6px;
+    outline: none;
+    transition: all 0.3s;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .fifa-input:focus {
+    border-color: var(--fifa-accent);
+    box-shadow: 0 0 8px rgba(0, 255, 135, 0.2);
+  }
+
+  .error-text {
+    color: var(--danger-red);
+    font-size: 0.8em;
+    margin-top: 5px;
+  }
+
+  .players-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 25px;
+    margin-bottom: 40px;
+  }
+
+  .fut-card {
+    background: rgba(20, 30, 55, 0.85);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    padding: 20px 15px;
+    text-align: center;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .fut-card:hover {
+    transform: translateY(-8px);
+    border-color: var(--fifa-accent);
+    box-shadow: 0 12px 24px rgba(0, 255, 135, 0.25);
+  }
+
+  .card-stats-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    text-align: center;
+    line-height: 1.1;
+  }
+
+  .badge-rating {
+    font-family: var(--font-title);
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--fifa-accent);
+    display: block;
+  }
+
+  .badge-position {
+    font-family: var(--font-title);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .player-avatar-container {
+    width: 90px;
+    height: 90px;
+    margin: 5px auto 15px auto;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 70%);
+    border-radius: 50%;
+  }
+
+  .player-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+  }
+
+  .player-info {
+    flex-grow: 1;
+  }
+
+  .player-info h3 {
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    margin: 0 0 4px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .player-club {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin: 0 0 15px 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+
+  .btn-action {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    padding: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .btn-action:hover {
+    background: var(--text-main);
+    color: var(--fifa-bg-dark);
+  }
+
+  .btn-action.primary:hover {
+    background: var(--fifa-accent);
+    border-color: var(--fifa-accent);
+    color: var(--fifa-bg-dark);
+  }
+
+  .btn-action.warning:hover {
+    background: var(--fut-gold);
+    border-color: var(--fut-gold);
+    color: var(--fifa-bg-dark);
+  }
+
+  .btn-action.danger:hover {
+    background: var(--danger-red);
+    border-color: var(--danger-red);
+    color: white;
+  }
+
+  .pagination-glass {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--fifa-card-bg);
+    padding: 15px 25px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+  }
+
+  .page-btn {
+    background: transparent;
+    border: 1px solid var(--text-muted);
+    color: var(--text-main);
+    padding: 8px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-title);
+    text-transform: uppercase;
+    transition: all 0.3s;
+  }
+
+  .page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .page-btn:not(:disabled):hover {
+    border-color: var(--fifa-accent);
+    color: var(--fifa-accent);
+  }
+</style>
+
+<div class="dashboard-wrapper">
+  
+  <div class="section-header">
+    <h2>Plantel <span style="font-size: 1.2rem; color: var(--text-muted);">({{ filteredPlayers.length }} en pantalla)</span></h2>
+    <button routerLink="/create-player" class="btn-outline">+ Crear Jugador</button>
+  </div>
+
+  <div *ngIf="isEditing" class="glass-panel" style="border-color: var(--fut-gold);">
+    <h3 style="margin-top: 0; color: var(--fut-gold); font-family: var(--font-title); text-transform: uppercase;">✏️ Modo Edición Activo</h3>
     
-    <form [formGroup]="playerForm" (ngSubmit)="guardarEdicion()" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+    <form [formGroup]="playerForm" (ngSubmit)="guardarEdicion()" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
       
-      <div>
-        <label style="font-weight: bold; font-size: 0.9em;">Nombre:</label>
-        <input type="text" formControlName="name" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-        <div *ngIf="playerForm.get('name')?.invalid && playerForm.get('name')?.touched" style="color: #dc3545; font-size: 0.8em; margin-top: 4px;">El nombre es obligatorio.</div>
+      <div class="input-group">
+        <label>Nombre</label>
+        <input type="text" formControlName="name" class="fifa-input" />
+        <div *ngIf="playerForm.get('name')?.invalid && playerForm.get('name')?.touched" class="error-text">El nombre es obligatorio.</div>
       </div>
 
-      <div>
-        <label style="font-weight: bold; font-size: 0.9em;">Club:</label>
-        <input type="text" formControlName="club" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-        <div *ngIf="playerForm.get('club')?.invalid && playerForm.get('club')?.touched" style="color: #dc3545; font-size: 0.8em; margin-top: 4px;">El club es obligatorio.</div>
+      <div class="input-group">
+        <label>Club</label>
+        <input type="text" formControlName="club" class="fifa-input" />
+        <div *ngIf="playerForm.get('club')?.invalid && playerForm.get('club')?.touched" class="error-text">El club es obligatorio.</div>
       </div>
 
-      <div>
-        <label style="font-weight: bold; font-size: 0.9em;">Posición:</label>
-        <input type="text" formControlName="position" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-        <div *ngIf="playerForm.get('position')?.invalid && playerForm.get('position')?.touched" style="color: #dc3545; font-size: 0.8em; margin-top: 4px;">La posición es obligatoria.</div>
+      <div class="input-group">
+        <label>Posición</label>
+        <input type="text" formControlName="position" class="fifa-input" />
+        <div *ngIf="playerForm.get('position')?.invalid && playerForm.get('position')?.touched" class="error-text">La posición es obligatoria.</div>
       </div>
 
-      <div>
-        <label style="font-weight: bold; font-size: 0.9em;">Nacionalidad:</label>
-        <input type="text" formControlName="nationality" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-        <div *ngIf="playerForm.get('nationality')?.invalid && playerForm.get('nationality')?.touched" style="color: #dc3545; font-size: 0.8em; margin-top: 4px;">La nacionalidad es obligatoria.</div>
+      <div class="input-group">
+        <label>Nacionalidad</label>
+        <input type="text" formControlName="nationality" class="fifa-input" />
+        <div *ngIf="playerForm.get('nationality')?.invalid && playerForm.get('nationality')?.touched" class="error-text">La nacionalidad es obligatoria.</div>
       </div>
 
-      <div>
-        <label style="font-weight: bold; font-size: 0.9em;">Calificación (Rating):</label>
-        <input type="number" formControlName="rating" style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 4px;" />
-        <div *ngIf="playerForm.get('rating')?.invalid && playerForm.get('rating')?.touched" style="color: #dc3545; font-size: 0.8em; margin-top: 4px;">Debe ser un número válido (1-99).</div>
+      <div class="input-group">
+        <label>Calificación (Rating)</label>
+        <input type="number" formControlName="rating" class="fifa-input" />
+        <div *ngIf="playerForm.get('rating')?.invalid && playerForm.get('rating')?.touched" class="error-text">Debe ser un número válido (1-99).</div>
       </div>
 
       <div style="grid-column: span 2; display: flex; gap: 10px; margin-top: 10px;">
-        <button type="submit" [disabled]="playerForm.invalid" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; opacity: {{ playerForm.invalid ? '0.5' : '1' }};">
+        <button type="submit" [disabled]="playerForm.invalid" class="btn-outline" style="background: var(--fifa-accent); color: var(--fifa-bg-dark); opacity: {{ playerForm.invalid ? '0.5' : '1' }};">
           💾 Guardar Cambios
         </button>
-        <button type="button" (click)="cancelarEdicion()" style="padding: 10px 20px; background-color: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+        <button type="button" (click)="cancelarEdicion()" class="btn-outline" style="border-color: var(--text-muted); color: var(--text-muted);">
           ❌ Cancelar
         </button>
       </div>
-
     </form>
   </div>
-  <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center;">
-    <input 
-      type="text" 
-      [(ngModel)]="searchTerm" 
-      (input)="onSearch()" 
-      placeholder="Buscar por nombre o club..."
-      style="padding: 10px; width: 100%; max-width: 400px; border: 1px solid #ccc; border-radius: 4px;"
-    />
+
+  <div class="glass-panel flex-row">
+    <div class="input-group" style="flex: 3;">
+      <label>Base de Datos</label>
+      <input type="text" [(ngModel)]="searchTerm" (input)="onSearch()" placeholder="Buscar por nombre o club..." class="fifa-input">
+    </div>
     
-    <button 
-      (click)="exportToCSV()" 
-      style="padding: 10px 15px; background-color: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
-      📥 Descargar CSV
-    </button>
-    <button 
-      routerLink="/create-player" 
-      style="padding: 10px 15px; background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px;">
-      ➕ Crear Jugador
-    </button>
+    <div style="flex: 1; text-align: right;">
+      <button (click)="exportToCSV()" class="btn-outline" style="border-color: var(--fut-gold); color: var(--fut-gold); height: 40px;">
+        📥 Descargar CSV
+      </button>
+    </div>
   </div>
 
-  <table style="width: 100%; border-collapse: collapse; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <thead>
-      <tr style="background-color: #0056b3; color: white; text-align: left;">
-        <th style="padding: 12px;">Nombre</th>
-        <th style="padding: 12px;">Club</th>
-        <th style="padding: 12px;">Nacionalidad</th>
-        <th style="padding: 12px; text-align: center;">Rating</th>
-        <th style="padding: 12px; text-align: center;">Edad</th>
-        <th style="padding: 12px; text-align: center;">Acciones</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let p of filteredPlayers" style="border-bottom: 1px solid #eee;">
-        <td style="padding: 12px;">{{ p.dataValues?.longName || p.longName || p.name }}</td>
-        <td style="padding: 12px;">{{ p.dataValues?.clubName || p.clubName || p.club }}</td>
-        <td style="padding: 12px;">{{ p.dataValues?.nationalityName || p.nationalityName || p.nationality }}</td>
-        <td style="padding: 12px; text-align: center; font-weight: bold; color: #2e7d32;">{{ p.dataValues?.overall || p.overall || p.rating }}</td>
-        <td style="padding: 12px; text-align: center;">{{ p.dataValues?.age || p.age }}</td>
-        
-        <td style="padding: 12px; text-align: center; display: flex; gap: 5px; justify-content: center;">
-          <button 
-            [routerLink]="['/player-detail', p.id || p.dataValues?.id]"
-            style="padding: 6px 12px; background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
-            📊 Ver Radar
-          </button>
-          
-          <button 
-            (click)="abrirModoEdicion(p)" 
-            style="padding: 6px 12px; background-color: #ffc107; color: #333; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em; font-weight: bold;">
-            ✏️ Editar
-          </button>
+  <div class="players-grid" *ngIf="filteredPlayers.length > 0">
+    <div class="fut-card" *ngFor="let p of filteredPlayers">
+      
+      <div class="card-stats-badge">
+        <span class="badge-rating">{{ p.dataValues?.overall || p.overall || p.rating }}</span>
+        <span class="badge-position">{{ p.dataValues?.playerPositions || p.playerPositions || p.position || 'N/A' }}</span>
+      </div>
 
-          <button 
-            (click)="deletePlayer(p.id || p.dataValues?.id)" 
-            style="padding: 6px 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9em;">
-            🗑️ Eliminar
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
+      <div class="player-avatar-container">
+        <img [src]="p.dataValues?.playerFaceUrl || p.playerFaceUrl || 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png'" alt="Avatar" class="player-avatar">
+      </div>
 
-  <div *ngIf="filteredPlayers.length === 0" style="margin-top: 20px; text-align: center; color: #777;">
-    No se encontraron jugadores con "{{ searchTerm }}"
+      <div class="player-info">
+        <h3>{{ p.dataValues?.longName || p.longName || p.name }}</h3>
+        <p class="player-club">{{ p.dataValues?.clubName || p.clubName || p.club }}</p>
+        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">{{ p.dataValues?.nationalityName || p.nationalityName || p.nationality }} • {{ p.dataValues?.age || p.age }} Años</p>
+      </div>
+
+      <div class="card-actions" style="margin-top: 15px;">
+        <button [routerLink]="['/player-detail', p.id || p.dataValues?.id]" class="btn-action primary" title="Ver Radar de Stats">📊</button>
+        <button (click)="abrirModoEdicion(p)" class="btn-action warning" title="Editar Perfil">✏️</button>
+        <button (click)="deletePlayer(p.id || p.dataValues?.id)" class="btn-action danger" title="Eliminar Jugador">🗑️</button>
+      </div>
+
+    </div>
   </div>
 
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 25px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-    
-    <button 
-      (click)="paginaAnterior()" 
-      [disabled]="currentPage === 1"
-      style="padding: 10px 20px; background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; opacity: {{ currentPage === 1 ? '0.5' : '1' }};">
-      ⬅ Anterior
-    </button>
+  <div *ngIf="filteredPlayers.length === 0" style="text-align: center; color: var(--text-muted); padding: 50px 0; font-size: 1.2rem;">
+    No se encontraron jugadores con el término "{{ searchTerm }}"
+  </div>
 
-    <div style="text-align: center; font-size: 1.1em; color: #333;">
-      <strong>Página {{ currentPage }} de {{ totalPages }}</strong><br>
-      <span style="font-size: 0.85em; color: #666;">(Total de registros: {{ totalRecords }})</span>
+  <div class="pagination-glass" *ngIf="filteredPlayers.length > 0">
+    <button class="page-btn" (click)="paginaAnterior()" [disabled]="currentPage === 1">⬅ Anterior</button>
+
+    <div style="text-align: center;">
+      <strong style="font-family: var(--font-title); letter-spacing: 1px; font-size: 1.1rem;">Página {{ currentPage }} de {{ totalPages }}</strong><br>
+      <span style="font-size: 0.85em; color: var(--text-muted);">Total BD: {{ totalRecords }} registros</span>
     </div>
 
-    <button 
-      (click)="siguientePagina()" 
-      [disabled]="currentPage === totalPages"
-      style="padding: 10px 20px; background-color: #0056b3; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; opacity: {{ currentPage === totalPages ? '0.5' : '1' }};">
-      Siguiente ➡
-    </button>
+    <button class="page-btn" (click)="siguientePagina()" [disabled]="currentPage === totalPages">Siguiente ➡</button>
   </div>
+
 </div>
