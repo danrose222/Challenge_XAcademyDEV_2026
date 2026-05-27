@@ -71,3 +71,8 @@ Durante el desarrollo, se tomaron las siguientes decisiones arquitectónicas y r
 4. Ejecutar el siguiente comando para construir y levantar los contenedores de la Base de Datos, Backend y Frontend:
    ```bash
    docker-compose up --build
+---
+
+## Agradecimientos y Créditos
+
+Este proyecto representa el cierre de una gran etapa de aprendizaje. Quiero extender un agradecimiento especial a todo el equipo y mentores de **XAcademy** por la guía, los conocimientos compartidos durante el programa y por proveer el repositorio base inicial que sirvió como excelente cimiento arquitectónico para desarrollar esta plataforma. ¡Gracias por la oportunidad!
