@@ -67,7 +67,7 @@ Durante el desarrollo, se tomaron las siguientes decisiones arquitectónicas y r
 
 1. Clonar el repositorio.
 2. Posicionarse en el directorio raíz (`cd football-api`).
-3. Crear un archivo `.env` en la raíz (puedes usar un `.env.example` de referencia) con las variables necesarias (`DATABASE_HOST`, `GEMINI_API_KEY`, `JWT_SECRET`, etc.).
+3. Crear un archivo `.env` en la raíz. Para facilitar la evaluación, he dejado un archivo `.env.example` en el repositorio con todas las claves estructurales. Solo debes copiarlo, renombrarlo a `.env` y agregar tu propia clave de Gemini en la variable `GOOGLE_GENERATIVE_AI_API_KEY` (las variables de base de datos ya están preconfiguradas para funcionar con Docker).
 4. Ejecutar el siguiente comando para construir y levantar los contenedores de la Base de Datos, Backend y Frontend:
    ```bash
    docker-compose up --build
