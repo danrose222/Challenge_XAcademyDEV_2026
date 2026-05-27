@@ -15,6 +15,16 @@ Este desarrollo cumple con los requerimientos obligatorios y puntos extra solici
 * **Validación:** class-validator y express-validator.
 * **Documentación:** Swagger / OpenAPI 3.0.
 
+## Vistas de la Aplicación
+
+- **Vista de LOGIN:** `![LOGIN](./assets/login.png)`
+- **Radar desde plantilla de jugadores:** `![Radar en la seleccion de jugador](./assets/vistaradar.png)`
+- **Modo Noche y Grilla de Jugadores:** `![Listado](./assets/listadodejugadores.png)`
+- **Radar de Habilidades (Chart.js):** `![Radar](./assets/radarenaccion.png)`
+- **Evolución Histórica y Coach IA:** `![Coach IA](./assets/dignosticoconIA.png)`
+
+---
+
 ---
 
 ## Funcionalidades Implementadas
@@ -67,7 +77,13 @@ Durante el desarrollo, se tomaron las siguientes decisiones arquitectónicas y r
 
 1. Clonar el repositorio.
 2. Posicionarse en el directorio raíz (`cd football-api`).
-3. Crear un archivo `.env` en la raíz (puedes usar un `.env.example` de referencia) con las variables necesarias (`DATABASE_HOST`, `GEMINI_API_KEY`, `JWT_SECRET`, etc.).
+3. Crear un archivo `.env` en la raíz. Para facilitar la evaluación, he dejado un archivo `.env.example` en el repositorio con todas las claves estructurales. Solo debes copiarlo, renombrarlo a `.env` y agregar tu propia clave de Gemini en la variable `GOOGLE_GENERATIVE_AI_API_KEY` (las variables de base de datos ya están preconfiguradas para funcionar con Docker).
 4. Ejecutar el siguiente comando para construir y levantar los contenedores de la Base de Datos, Backend y Frontend:
    ```bash
    docker-compose up --build
+---
+
+## Agradecimientos y Créditos
+
+Este proyecto representa el cierre de una gran etapa de aprendizaje. Quiero extender un agradecimiento especial a todo el equipo y mentores de **XAcademy** por la guía, los conocimientos compartidos durante el programa y por proveer el repositorio base inicial que sirvió como excelente cimiento arquitectónico para desarrollar esta plataforma. ¡Gracias por la oportunidad!
+
